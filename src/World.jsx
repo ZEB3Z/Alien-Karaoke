@@ -495,7 +495,7 @@ class WorldBoundary extends Component {
 export default function World({mode='menu',profile=null,levelRef,event=null,onTransitionComplete,reducedMotion=false}){
   const complete=useRef(onTransitionComplete);complete.current=onTransitionComplete;
   useEffect(()=>{if(mode!=='abduction')return;const id=setTimeout(()=>complete.current?.(),9300);return()=>clearTimeout(id);},[mode]);
-  return <WorldBoundary><Canvas className="world-canvas" camera={{position:[10.2,6.7,14.7],fov:47,near:.1,far:100}} dpr={[1,1.5]} gl={{antialias:true,alpha:false,powerPreference:'high-performance'}} style={{position:'absolute',inset:0,width:'100%',height:'100%'}} onCreated={({gl})=>{gl.outputColorSpace=THREE.SRGBColorSpace;gl.toneMapping=THREE.ACESFilmicToneMapping;gl.toneMappingExposure=1.12;}}>
+  return <WorldBoundary><Canvas className="world-canvas" resize={{offsetSize:true}} camera={{position:[10.2,6.7,14.7],fov:47,near:.1,far:100}} dpr={[1,1.5]} gl={{antialias:true,alpha:false,powerPreference:'high-performance'}} style={{position:'absolute',inset:0,width:'100%',height:'100%'}} onCreated={({gl})=>{gl.outputColorSpace=THREE.SRGBColorSpace;gl.toneMapping=THREE.ACESFilmicToneMapping;gl.toneMappingExposure=1.12;}}>
     <Scene mode={mode} profile={profile} levelRef={levelRef} event={event} reducedMotion={reducedMotion}/>
   </Canvas></WorldBoundary>;
 }
@@ -519,7 +519,7 @@ function PreviewScene({profile}) {
 /** Registration preview: the exact textured mesh used in the game and portraits. */
 export function AvatarPreview({profile}) {
   return <div className="avatar-filter-preview" role="img" aria-label={`${profile?.nickname||'Your'} transformed 3D alien preview`} style={{width:'100%',height:300,position:'relative',overflow:'hidden',borderRadius:8}}>
-    <WorldBoundary><Canvas camera={{position:[0,2.25,5.5],fov:36,near:.1,far:30}} dpr={[1,1.5]} gl={{antialias:true,alpha:false,powerPreference:'low-power'}} onCreated={({gl})=>{gl.outputColorSpace=THREE.SRGBColorSpace;gl.toneMapping=THREE.ACESFilmicToneMapping;gl.toneMappingExposure=1.12;}}>
+    <WorldBoundary><Canvas resize={{offsetSize:true}} camera={{position:[0,2.25,5.5],fov:36,near:.1,far:30}} dpr={[1,1.5]} gl={{antialias:true,alpha:false,powerPreference:'low-power'}} onCreated={({gl})=>{gl.outputColorSpace=THREE.SRGBColorSpace;gl.toneMapping=THREE.ACESFilmicToneMapping;gl.toneMappingExposure=1.12;}}>
       <PreviewScene profile={profile}/>
     </Canvas></WorldBoundary>
   </div>;
