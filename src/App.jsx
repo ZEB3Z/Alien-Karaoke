@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ArrowUpRight, ArrowRight, Volume2, VolumeX, X, Trophy, Mic2, Play, Pause, RotateCcw, LogOut, Radio, Camera, Sparkles, ChevronLeft, Music2, Check, ExternalLink, MoveRight, CircleHelp } from 'lucide-react';
 import World, { AlienPortrait } from './World.jsx';
 import { isAlienFaceProfile } from './face/texture.js';
@@ -141,7 +141,35 @@ export default function App(){
   const formatTime=s=>`${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
   const closeDialog=useCallback(()=>setDialog(null),[]);
 
-  return <div className={`game game-${mode} ${motion?'reduced-motion':''} ${cinema?'cinema':''}`}>
+  const gameRef=useRef(null);
+  useLayoutEffect(()=>{
+    const el=gameRef.current;if(!el)return;
+    let raf=0;
+    const fit=()=>{
+      const vw=window.innerWidth,vh=window.innerHeight;
+      if(vw<=760){el.classList.remove('fit','measure');el.style.removeProperty('--fit');el.style.removeProperty('--fit-w');return;}
+      el.classList.add('fit','measure');
+      let s=1;
+      for(let i=0;i<4;i++){
+        el.style.setProperty('--fit-w',`${vw/s}px`);
+        const h=el.offsetHeight;
+        const next=Math.max(.4,Math.min(1,vh/h));
+        if(Math.abs(next-s)<.002){s=next;break;}
+        s=next;
+      }
+      el.style.setProperty('--fit-w',`${vw/s}px`);
+      el.style.setProperty('--fit-h',`${vh/s}px`);
+      el.style.setProperty('--fit',String(s));
+      el.classList.remove('measure');
+    };
+    const queue=()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(fit);};
+    fit();
+    window.addEventListener('resize',queue);
+    document.fonts?.ready.then(queue);
+    return()=>{window.removeEventListener('resize',queue);cancelAnimationFrame(raf);};
+  },[mode,cinema,songError,reveal,result,profile,song]);
+
+  return <div ref={gameRef} className={`game game-${mode} ${motion?'reduced-motion':''} ${cinema?'cinema':''}`}>
     <div className="world-wrap"><World mode={mode} profile={profile} levelRef={audio.levelRef} event={event} onTransitionComplete={enterClub} reducedMotion={motion}/></div>
     <div className="world-vignette"/><div className="scanlines" aria-hidden="true"/>
     <header className="header"><Brand onClick={mode==='performance'?leavePerformance:home}/><nav aria-label="Main navigation"><button className={mode==='menu'?'active':''} onClick={mode==='performance'?leavePerformance:home}>THE BOOTH</button><button onClick={()=>{unlock();setDialog('leaderboard');}}>HALL OF FAME</button><button onClick={()=>{unlock();setDialog('help');}}>HOW TO PLAY <ArrowUpRight size={12}/></button></nav><div className="header-right"><span className="online"><i/> TRANSMITTING LIVE</span><button className="icon-button sound-toggle" onClick={()=>{audio.unlock();setMuted(!muted);}} aria-label={muted?'Enable game sound':'Mute game sound'} title={muted?'Enable game sound':'Mute game sound'}>{muted?<VolumeX size={18}/>:<Volume2 size={18}/>}</button><button className="icon-button" onClick={()=>setDialog('settings')} aria-label="Sound and motion settings"><span className="settings-symbol">≡</span></button></div></header>
