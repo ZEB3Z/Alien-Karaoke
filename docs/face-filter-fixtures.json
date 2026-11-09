@@ -1,0 +1,65 @@
+{
+  "purpose": "Local-only, non-generative face filter validation. Public-domain photographs; not intended for shipping in game assets.",
+  "photos": [
+    {
+      "file": "grace-hopper-official.jpg",
+      "subject": "Grace Hopper",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/a/ad/Commodore_Grace_M._Hopper%2C_USN_%28covered%29.jpg",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Commodore_Grace_M._Hopper,_USN_(covered).jpg",
+      "license": "Public domain",
+      "copyrighted": "False",
+      "artist": "James S. Davis",
+      "dimensions": [
+        2400,
+        3000
+      ]
+    },
+    {
+      "file": "katherine-johnson.jpg",
+      "subject": "Katherine Johnson",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/6/6d/Katherine_Johnson_1983.jpg",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Katherine_Johnson_1983.jpg",
+      "license": "Public domain",
+      "copyrighted": "False",
+      "artist": "NASA",
+      "dimensions": [
+        2400,
+        3000
+      ]
+    },
+    {
+      "file": "barack-obama.jpg",
+      "subject": "Barack Obama",
+      "source": "https://upload.wikimedia.org/wikipedia/commons/8/8d/President_Barack_Obama.jpg",
+      "source_page": "https://commons.wikimedia.org/wiki/File:President_Barack_Obama.jpg",
+      "license": "Public domain",
+      "copyrighted": "False",
+      "artist": "Official White House Photo by <a href=\"https://en.wikipedia.org/wiki/Pete_Souza\" class=\"extiw\" title=\"w:Pete Souza\">Pete Souza</a>",
+      "dimensions": [
+        2687,
+        3356
+      ]
+    },
+    {
+      "file": "eileen-collins.png",
+      "subject": "Eileen Collins",
+      "source": "https://raw.githubusercontent.com/scikit-image/scikit-image/v0.22.0/skimage/data/astronaut.png",
+      "source_page": "https://scikit-image.org/docs/stable/api/skimage.data.html#skimage.data.astronaut",
+      "license": "Public domain (NASA / U.S. government work)",
+      "copyrighted": false,
+      "artist": "NASA",
+      "dimensions": [
+        512,
+        512
+      ]
+    }
+  ],
+  "cases": {
+    "neutral": "Unaltered crop",
+    "dim": "Brightness \u00d70.48",
+    "bright": "Brightness \u00d71.40",
+    "warm": "RGB gain [1.14,0.94,0.72]",
+    "side-shadow": "Horizontal luminance gain0.46\u21921.05",
+    "tilted": "11\u00b0rotation; dark neutral background"
+  }
+}
