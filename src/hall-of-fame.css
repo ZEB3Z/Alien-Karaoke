@@ -1,0 +1,79 @@
+/* The archive is a character gallery, never a ranked results table. */
+.arcade-modal.gallery-modal{width:min(1050px,100%);max-height:calc(100dvh - 48px);background:#101221;padding:0;border:1px solid #655f75;box-shadow:12px 12px 0 #02040b88}
+.gallery-modal .close-button{position:sticky;float:right;top:16px;margin:16px 16px -50px 0;z-index:12;background:#0d0e19dd;width:40px;height:40px;border:1px solid #6f6981}
+.gallery-modal .close-button:hover{color:#c7ff54;border-color:#c7ff54}
+.hall-of-fame{color:#f5f4e8;padding:38px 34px 28px;background:radial-gradient(circle at 60% 0%,#50366545,transparent 35%),linear-gradient(170deg,#151525,#101221 54%,#161224)}
+.hall-intro{padding-right:38px}
+.hall-intro-line{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-top:15px}
+.gallery-modal .hall-intro h2{font:900 clamp(54px,6vw,94px)/.81 var(--display);letter-spacing:-.014em;margin:0}
+.gallery-modal .hall-intro h2 em{color:var(--acid)}
+.hall-intro p{max-width:510px;margin:23px 0 0;font:13px/1.65 'DM Sans',sans-serif;color:#aeadc0}
+.hall-counter{display:flex;align-items:center;gap:12px;flex-shrink:0;margin-bottom:9px;transform:rotate(5deg);padding:7px 15px;border:1px solid #c7ff54a0;background:#c7ff5414;color:var(--acid)}
+.hall-counter strong{font:900 56px/.85 var(--display)}
+.hall-counter span{font:700 9px/1.35 var(--mono);letter-spacing:.1em}
+.hall-spotlight{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);margin-top:32px;min-height:352px;border:1px solid #7d7190;background:#19182b;box-shadow:7px 7px 0 #080810}
+.hall-spotlight-stage{position:relative;min-height:365px;overflow:hidden;isolation:isolate;background:radial-gradient(ellipse at 51% 58%,#49595465,transparent 55%),linear-gradient(155deg,#263247,#141524 70%);border-right:1px solid #7d7190}
+.hall-stage-kicker{position:absolute;left:19px;top:18px;z-index:4;display:flex;gap:8px;align-items:center;font:700 9px var(--mono);letter-spacing:.1em;color:#dbefc4}
+.hall-blink{width:7px;height:7px;border-radius:50%;background:#d0ff5b;box-shadow:0 0 12px #d0ff5b;animation:hall-blink 1.8s infinite}
+.hall-stage-halo{position:absolute;width:245px;height:245px;border:1px dashed #c7ff5466;border-radius:50%;left:50%;top:47%;transform:translate(-50%,-50%);box-shadow:0 0 0 33px #c7ff5406,0 0 0 73px #c7ff5404}
+.hall-spotlight-stage .avatar-filter-preview{position:absolute!important;inset:36px 0 0;width:100%!important;height:338px!important;background:transparent;border:0;z-index:2;overflow:hidden}
+.hall-spotlight-stage .avatar-filter-preview canvas{mix-blend-mode:normal}
+.hall-stage-floor{position:absolute;bottom:13px;left:17%;right:17%;height:24px;border-radius:50%;background:#c7ff5420;filter:blur(14px);z-index:1}
+.hall-speech{position:absolute;right:12px;top:57px;z-index:3;width:139px;padding:10px 11px;background:#faf0c9;color:#1c1830;border:2px solid #1c1830;border-radius:15px 15px 3px 15px;transform:rotate(9deg);font:900 12px/1.15 var(--display);text-align:center;box-shadow:3px 4px 0 #0a0a16;pointer-events:none;animation:hall-speech 3.5s ease-in-out infinite}
+.hall-stage-corner{position:absolute;bottom:17px;left:19px;font:8px var(--mono);letter-spacing:.08em;color:#b7b2cc;z-index:3}
+.hall-spotlight-info{min-width:0;display:flex;flex-direction:column;padding:24px 28px 20px;position:relative;background:repeating-linear-gradient(-35deg,#ffffff03 0 1px,transparent 1px 22px)}
+.hall-stamp{align-self:flex-start;display:flex;align-items:center;gap:6px;border:1px solid #f89bc7;color:#f89bc7;padding:5px 9px;font:700 8px var(--mono);letter-spacing:.05em;transform:rotate(-2deg)}
+.hall-id{margin-top:21px;color:#8885aa;font:9px var(--mono);letter-spacing:.14em}
+.hall-spotlight-info h3{font:900 clamp(40px,5vw,67px)/.88 var(--display);overflow-wrap:anywhere;margin:7px 0 9px;letter-spacing:.005em;text-transform:uppercase;color:#fff}
+.hall-title{color:var(--hall-accent);font:800 14px/1.25 var(--display);letter-spacing:.08em}
+.hall-last-song{display:flex;align-items:flex-start;gap:11px;border-top:1px solid #ffffff24;padding-top:15px;margin-top:20px;min-width:0}
+.hall-last-song>svg{color:var(--hall-accent);margin-top:3px}
+.hall-last-song>div{min-width:0;display:grid;gap:6px}
+.hall-last-song span,.hall-stat-row span{font:8px var(--mono);color:#9393a9;letter-spacing:.08em}
+.hall-last-song b{font:600 14px/1.3 'DM Sans',sans-serif;overflow-wrap:anywhere}
+.hall-stat-row{display:flex;gap:30px;margin-top:16px}
+.hall-stat-row div{display:flex;flex-direction:column;gap:2px}
+.hall-stat-row b{font:900 32px/1 var(--display);color:var(--hall-accent)}
+.hall-stat-row small{font:9px var(--mono);color:#9898a8}
+.hall-last-seen{font:8px var(--mono);color:#818294;margin-top:13px}
+.hall-pager{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;padding-top:14px}
+.hall-pager>span{font:8px var(--mono);color:#888ba3;text-align:center}
+.hall-pager button{width:37px;height:33px;display:grid;place-items:center;border:1px solid #797389;color:#f3f0e6;background:#ffffff08}
+.hall-pager button:hover{background:var(--hall-accent);border-color:var(--hall-accent);color:#171325}
+.hall-roster-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:40px 0 16px}
+.hall-roster-heading h3{font:900 32px/.98 var(--display);margin-top:9px}
+.hall-roster-heading>span{font:8px var(--mono);color:#9293a9;text-align:right}
+.hall-roster{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
+.hall-character{min-width:0;padding:0;overflow:hidden;border:1px solid #59556f;background:#1b1b2c;text-align:left;position:relative;transform:translateZ(0);transition:border-color .2s,background .2s,box-shadow .2s,transform .2s}
+.hall-character:hover,.hall-character:focus-visible{border-color:var(--hall-accent);background:#242137;box-shadow:4px 5px 0 #080812;transform:translateY(-4px)}
+.hall-character.chosen{border-color:var(--hall-accent);box-shadow:inset 0 0 0 1px var(--hall-accent)}
+.hall-card-head{display:flex;justify-content:space-between;align-items:center;padding:11px 12px 0;position:relative;z-index:2;font:7px var(--mono);letter-spacing:.09em;color:#9897aa}
+.hall-card-head svg{color:var(--hall-accent)}
+.hall-character-stage{height:196px;position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 70%,color-mix(in srgb,var(--hall-accent),transparent 83%),transparent 66%)}
+.hall-orbit{position:absolute;left:50%;top:48%;width:155px;height:155px;border:1px dashed color-mix(in srgb,var(--hall-accent),transparent 55%);transform:translate(-50%,-50%) rotate(25deg);border-radius:50%;z-index:-1}
+.hall-orbit:after{content:'✳';position:absolute;right:-8px;top:16px;color:var(--hall-accent);font-size:20px}
+.hall-character-dance{position:absolute;inset:-12px 12px 0;display:flex;align-items:center;justify-content:center;transform-origin:50% 84%;animation:hall-dance 3.3s ease-in-out infinite;animation-delay:var(--hall-delay)}
+.hall-character-dance .alien-portrait{display:block;width:min(100%,230px)!important;height:100%!important;object-fit:contain;max-height:206px;background:transparent;border-radius:0;filter:drop-shadow(2px 9px 2px #0006)}
+.hall-character-shadow{position:absolute;width:85px;height:14px;bottom:16px;left:50%;transform:translateX(-50%);background:#0809158a;filter:blur(6px);border-radius:50%;z-index:-1}
+.hall-card-sticker{position:absolute;bottom:12px;left:10px;max-width:75%;padding:4px 7px;background:var(--hall-accent);color:#171425;font:900 11px/.95 var(--display);transform:rotate(var(--hall-tilt));box-shadow:2px 2px 0 #101020}
+.hall-card-data{padding:10px 12px 12px;display:grid;gap:5px;min-width:0}
+.hall-card-data strong{font:900 26px/.98 var(--display);text-transform:uppercase;overflow-wrap:anywhere}
+.hall-card-data>span{font:10px/1.4 'DM Sans',sans-serif;color:#aaa8bc;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.hall-card-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;border-top:1px solid #ffffff1c;font:8px var(--mono);color:#9f9eaf}
+.hall-card-foot span{display:flex;align-items:center;gap:4px}
+.hall-card-foot span:last-child{color:var(--hall-accent)}
+.hall-endnote{display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;margin-top:29px;font:8px/1.7 var(--mono);color:#89869d}
+.hall-empty{min-height:360px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-top:28px;border:1px dashed #70687f;background:radial-gradient(ellipse at 50% 42%,#b4ea4440,transparent 48%),#141523;text-align:center;padding:30px 20px}
+.hall-empty-orbit{display:grid;place-items:center;width:104px;height:104px;border:2px dashed #b6fa68;border-radius:50%;transform:rotate(-13deg);margin-bottom:20px}
+.hall-empty-orbit span{font:900 76px var(--display);color:#d7ffab;animation:hall-dance 3s infinite}
+.hall-empty h3{font:900 36px var(--display)}
+.hall-empty p{font:12px/1.7 'DM Sans',sans-serif;color:#b2acc3;max-width:420px;margin:12px 0 24px}
+.hall-empty>span{display:flex;gap:7px;align-items:center;color:var(--acid);font:9px var(--mono)}
+@keyframes hall-dance{0%,100%{transform:translateY(3px) rotate(-4deg)}50%{transform:translateY(-8px) rotate(5deg)}}
+@keyframes hall-blink{50%{opacity:.2}}
+@keyframes hall-speech{0%,100%{transform:translateY(0) rotate(9deg)}50%{transform:translateY(-6px) rotate(6deg)}}
+@media(max-width:800px){.arcade-modal.gallery-modal{max-height:calc(100dvh - 28px)}.hall-of-fame{padding:27px 18px 20px}.hall-intro{padding-right:32px}.gallery-modal .hall-intro h2{font-size:clamp(51px,9vw,70px)}.hall-spotlight{grid-template-columns:1fr}.hall-spotlight-stage{min-height:315px;border-right:0;border-bottom:1px solid #7d7190}.hall-spotlight-stage .avatar-filter-preview{height:290px!important;top:25px}.hall-spotlight-info{padding:22px}.hall-roster{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:510px){.gallery-modal .close-button{right:0;top:8px;margin:8px 9px -40px 0;width:33px;height:33px}.gallery-modal .hall-intro h2{font-size:54px}.hall-intro p{font-size:11px;margin-top:18px}.hall-counter{padding:5px 8px;gap:7px}.hall-counter strong{font-size:36px}.hall-counter span{font-size:6px}.hall-spotlight{margin-top:24px}.hall-spotlight-stage{min-height:285px}.hall-spotlight-stage .avatar-filter-preview{height:270px!important;top:14px}.hall-speech{width:115px;font-size:10px;right:8px;top:53px}.hall-spotlight-info h3{font-size:45px}.hall-roster{gap:9px}.hall-roster-heading{align-items:flex-start;flex-direction:column;gap:7px}.hall-roster-heading>span{text-align:left}.hall-roster-heading h3{font-size:28px}.hall-character-stage{height:155px}.hall-character-dance .alien-portrait{height:173px!important}.hall-card-head{font-size:6px;padding:8px 8px 0}.hall-card-data{padding:8px}.hall-card-data strong{font-size:22px}.hall-card-sticker{font-size:9px;bottom:7px;left:5px}.hall-card-foot{padding:8px;font-size:6px}.hall-endnote{font-size:7px}}
+@media(prefers-reduced-motion:reduce){.hall-character-dance,.hall-blink,.hall-speech,.hall-empty-orbit span{animation:none!important}.hall-character:hover,.hall-character:focus-visible{transform:none}}
+
+.hall-alien-loading{display:block;width:70%;height:83%;max-width:150px;opacity:.65;filter:drop-shadow(0 10px 10px #0006)}

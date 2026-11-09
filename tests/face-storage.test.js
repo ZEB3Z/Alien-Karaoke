@@ -27,7 +27,8 @@ test('fifty repeat performances store one transformed PNG and reload complete id
   const reloaded=loadRecords();
   assert.equal(reloaded.length,50);
   assert.ok(reloaded.every(value=>value.photo===png&&value.faceVersion==='landmark-alien-v2'&&value.faceMeta.landmarks===478));
-  assert.equal(reloaded[0].score,100);
+  assert.equal(reloaded[0].song,'Cosmic Song 49');
+  assert.equal(reloaded[0].score,86);
 });
 
 test('distinct transformed faces receive distinct references and remain attached to their scores',()=>{

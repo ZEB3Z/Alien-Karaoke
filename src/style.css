@@ -28,3 +28,13 @@
 @media(max-width:600px){.performance-top-actions{gap:5px}.performance-top-actions .glass-button{font-size:6px;padding:9px 7px}.chaos-summon{letter-spacing:0;gap:5px}.chaos-summon svg{width:12px;height:12px}}
 
 @media(max-width:400px){.performance-top{flex-wrap:wrap;gap:8px}.performance-top-actions{margin-left:auto}}
+/* Recent plays are chronological, not score rankings. */
+.recent-board .rank{font:700 8px var(--mono);min-width:22px;color:#9f93b5}
+.recent-board .rank-0{color:var(--acid)}
+.recent-board .record-info time{font:7px var(--mono);color:#82879c;letter-spacing:.02em}
+.recent-board .board-row{padding:4px 0}
+.recent-board .board-columns{margin-top:14px}
+.recent-board .board-heading .text-button{font-size:8px;white-space:nowrap}
+.recent-empty{display:flex;align-items:center;flex-direction:column;gap:7px;padding:29px 12px 22px;text-align:center;color:var(--acid)}
+.recent-empty strong{font:900 20px var(--display)}
+.recent-empty span{font:9px/1.5 var(--mono);color:#a9a6b9}

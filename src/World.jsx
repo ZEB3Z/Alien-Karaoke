@@ -500,12 +500,12 @@ export default function World({mode='menu',profile=null,levelRef,event=null,onTr
   </Canvas></WorldBoundary>;
 }
 
-function PreviewScene({profile}) {
+function PreviewScene({profile,transparent=false}) {
   const {camera}=useThree();
   const clockStart=useRef(0);
   useEffect(()=>{camera.lookAt(0,1.92,0);},[camera]);
   return <>
-    <color attach="background" args={['#181b26']}/>
+    {!transparent&&<color attach="background" args={['#181b26']}/>}
     <ambientLight intensity={1.25} color="#c6c8ee"/>
     <hemisphereLight args={['#e2d7fa','#464368',2]}/>
     <directionalLight position={[3,9,8]} intensity={3.1} color="#f4f0c9"/>
@@ -517,30 +517,30 @@ function PreviewScene({profile}) {
 }
 
 /** Registration preview: the exact textured mesh used in the game and portraits. */
-export function AvatarPreview({profile}) {
+export function AvatarPreview({profile,transparent=false}) {
   return <div className="avatar-filter-preview" role="img" aria-label={`${profile?.nickname||'Your'} transformed 3D alien preview`} style={{width:'100%',height:300,position:'relative',overflow:'hidden',borderRadius:8}}>
-    <WorldBoundary><Canvas resize={{offsetSize:true}} camera={{position:[0,2.25,5.5],fov:36,near:.1,far:30}} dpr={[1,1.5]} gl={{antialias:true,alpha:false,powerPreference:'low-power'}} onCreated={({gl})=>{gl.outputColorSpace=THREE.SRGBColorSpace;gl.toneMapping=THREE.ACESFilmicToneMapping;gl.toneMappingExposure=1.12;}}>
-      <PreviewScene profile={profile}/>
+    <WorldBoundary><Canvas resize={{offsetSize:true}} camera={{position:[0,2.25,5.5],fov:36,near:.1,far:30}} dpr={[1,1.5]} gl={{antialias:true,alpha:transparent,powerPreference:'low-power'}} onCreated={({gl})=>{gl.outputColorSpace=THREE.SRGBColorSpace;gl.toneMapping=THREE.ACESFilmicToneMapping;gl.toneMappingExposure=1.12;if(transparent)gl.setClearColor('#000000',0);}}>
+      <PreviewScene profile={profile} transparent={transparent}/>
     </Canvas></WorldBoundary>
   </div>;
 }
 
 const portraitCache=new Map();
-const PORTRAIT_CACHE_LIMIT=24;
-export function AlienPortrait({profile,size=64,seed=0}){
+const PORTRAIT_CACHE_LIMIT=72;
+export function AlienPortrait({profile,size=64,seed=0,variant='head'}){
   const [url,setUrl]=useState('');
   useEffect(()=>{
     const photo=isAlienFaceProfile(profile)?profile.photo:null;
-    let cancelled=false;const key=`${faceTextureFingerprint(photo||'')}:${profile?.faceVersion||'default'}:${seed}`;
+    let cancelled=false;const key=`${faceTextureFingerprint(photo||'')}:${profile?.faceVersion||'default'}:${seed}:${variant}`;
     setUrl('');
     if(portraitCache.has(key)){setUrl(portraitCache.get(key));return;}
     const render=(texture=null)=>{
       if(cancelled){texture?.dispose();return;}
       let renderer,alien;
       try{
-        renderer=new THREE.WebGLRenderer({alpha:true,antialias:true,preserveDrawingBuffer:true});renderer.setSize(128,128);renderer.setPixelRatio(1);renderer.outputColorSpace=THREE.SRGBColorSpace;
+        renderer=new THREE.WebGLRenderer({alpha:true,antialias:true,preserveDrawingBuffer:true});renderer.setSize(variant==='full'?288:128,variant==='full'?288:128);renderer.setPixelRatio(1);renderer.outputColorSpace=THREE.SRGBColorSpace;
         renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;
-        const scene=new THREE.Scene();const camera=new THREE.PerspectiveCamera(35,1,.1,20);camera.position.set(.4,2.5,5.2);camera.lookAt(0,2,0);
+        const scene=new THREE.Scene();const camera=new THREE.PerspectiveCamera(variant==='full'?37:35,1,.1,20);if(variant==='full'){camera.position.set(.25,1.85,5.8);camera.lookAt(0,1.85,0);}else{camera.position.set(.4,2.5,5.2);camera.lookAt(0,2,0);}
         alien=makeAlien({seed,photoTexture:texture});alien.rotation.y=-.12;scene.add(alien);
         scene.add(new THREE.AmbientLight('#c6c8ee',1.25));scene.add(new THREE.HemisphereLight('#e2d7fa','#464368',2));const light=new THREE.DirectionalLight('#f4f0c9',3.1);light.position.set(3,9,8);scene.add(light);
         renderer.render(scene,camera);const result=renderer.domElement.toDataURL('image/png');portraitCache.set(key,result);if(!cancelled)setUrl(result);
@@ -550,6 +550,6 @@ export function AlienPortrait({profile,size=64,seed=0}){
     };
     if(photo){const img=new Image();img.onload=()=>render(textureFromPhoto(img));img.onerror=()=>render();img.src=photo;}else render();
     return()=>{cancelled=true;};
-  },[profile?.photo,profile?.faceVersion,seed]);
-  return url?<img className="alien-portrait" src={url} alt={`${profile?.nickname||'Galactic singer'}'s 3D alien`} width={size} height={size}/>:<svg className="alien-portrait" width={size} height={size} viewBox="0 0 64 64" role="img" aria-label="Alien portrait"><path fill="#b8e87b" d="M22 58l3-22h14l3 22-10-4z"/><ellipse fill="#b8e87b" cx="32" cy="24" rx="19" ry="22"/><ellipse fill="#172034" cx="24" cy="24" rx="5" ry="8" transform="rotate(-25 24 24)"/><ellipse fill="#172034" cx="40" cy="24" rx="5" ry="8" transform="rotate(25 40 24)"/></svg>;
+  },[profile?.photo,profile?.faceVersion,seed,variant]);
+  return url?<img className="alien-portrait" src={url} alt={`${profile?.nickname||'Galactic singer'}'s ${variant==='full'?'full-body ':''}3D alien`} width={size} height={size}/>:variant==='full'?<svg className="alien-portrait" width={size} height={size} viewBox="0 0 100 130" role="img" aria-label={`${profile?.nickname||'Galactic singer'} alien avatar`}><path fill="#b8e87b" d="M44 65h12l8 39 10 25-24-13-24 13 10-25zM32 72 14 103l7 4 25-34zm36 0 18 31-7 4-25-34z"/><ellipse cx="50" cy="40" rx="36" ry="40" fill="#b8e87b"/><ellipse cx="36" cy="40" rx="9" ry="15" transform="rotate(-28 36 40)" fill="#101629"/><ellipse cx="64" cy="40" rx="9" ry="15" transform="rotate(28 64 40)" fill="#101629"/></svg>:<svg className="alien-portrait" width={size} height={size} viewBox="0 0 64 64" role="img" aria-label="Alien portrait"><path fill="#b8e87b" d="M22 58l3-22h14l3 22-10-4z"/><ellipse fill="#b8e87b" cx="32" cy="24" rx="19" ry="22"/><ellipse fill="#172034" cx="24" cy="24" rx="5" ry="8" transform="rotate(-25 24 24)"/><ellipse fill="#172034" cx="40" cy="24" rx="5" ry="8" transform="rotate(25 40 24)"/></svg>;
 }

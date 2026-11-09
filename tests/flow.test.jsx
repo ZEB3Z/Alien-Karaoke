@@ -143,10 +143,11 @@ describe('participant journey', () => {
     expect(loadProfile()).toEqual(identity);
     expect(filterMock.transform).toHaveBeenCalledOnce();
     await user.click(screen.getByRole('button', { name: /HALL OF FAME/i }));
-    const board = screen.getByRole('dialog', { name: 'Galactic leaderboard' });
-    expect(within(board).getByText('Cosmic Dave')).toBeTruthy();
-    expect(within(board).getByText('Cosmic Test Song — Karaoke')).toBeTruthy();
+    const board = screen.getByRole('dialog', { name: 'Hall of Fame' });
+    expect(within(board).getAllByText('Cosmic Dave').length).toBeGreaterThan(0);
+    expect(within(board).getAllByText('Cosmic Test Song — Karaoke').length).toBeGreaterThan(0);
     expect(within(board).getByRole('img', { name: /Cosmic Dave 3D portrait/ }).dataset.photo).toBe(photo);
+    expect(board.querySelector('.hall-character')).toBeTruthy();
 
     view.unmount();
     render(<App />);
@@ -154,6 +155,33 @@ describe('participant journey', () => {
     expect(screen.getByTestId('world').dataset.profile).toBe(identity.id);
     expect(screen.getByText('Cosmic Test Song — Karaoke')).toBeTruthy();
     expect(loadRecords()).toHaveLength(1);
+  });
+
+  it('shows most recent plays first and puts each distinct singer into the animated hall', async () => {
+    const older = { id: 'first-play', profileId: 'a', nickname: 'Old Champion', photo,
+      faceVersion: 'landmark-alien-v2', song: 'Old Classic', videoId: 'dQw4w9WgXcQ', score: 100,
+      createdAt: '2026-11-01T12:00:00.000Z' };
+    const newest = { id: 'third-play', profileId: 'b', nickname: 'Newcomer', photo,
+      faceVersion: 'landmark-alien-v2', song: 'Another Banger', videoId: 'dQw4w9WgXcQ', score: 85,
+      createdAt: '2026-11-10T12:00:00.000Z' };
+    const middle = { ...newest, id: 'second-play', song: 'First Banger', score: 96,
+      createdAt: '2026-11-09T12:00:00.000Z' };
+    localStorage.setItem(STORAGE_KEYS.records, JSON.stringify([older, middle, newest]));
+    const user = userEvent.setup();
+    render(<App />);
+    const rows = document.querySelectorAll('.recent-board .board-row');
+    expect(rows).toHaveLength(3);
+    expect(rows[0].textContent).toContain('Newcomer');
+    expect(rows[0].textContent).toContain('85');
+    expect(rows[2].textContent).toContain('Old Champion');
+    await user.click(screen.getByRole('button', { name: /HALL OF FAME/i }));
+    const gallery = screen.getByRole('dialog', { name: 'Hall of Fame' });
+    expect(gallery.querySelectorAll('.hall-character')).toHaveLength(2);
+    expect(gallery.querySelector('.hall-spotlight-info h3').textContent).toBe('Newcomer');
+    expect(gallery.querySelector('.hall-stat-row').textContent).toContain('96');
+    expect(gallery.querySelector('.hall-stat-row').textContent).toContain('2');
+    await user.click(within(gallery).getByRole('button', { name: /Spotlight Old Champion/i }));
+    expect(gallery.querySelector('.hall-spotlight-info h3').textContent).toBe('Old Champion');
   });
 
   it('logs out the current player when the THE BOOTH tab is clicked', async () => {
@@ -289,13 +317,16 @@ describe('participant journey', () => {
     expect(screen.getByText(/Device storage is full/)).toBeTruthy();
     expect(document.querySelector('.winner-name b').textContent).toMatch(/^#2/);
     expect(loadRecords()).toHaveLength(1);
-    await user.click(screen.getByRole('button', { name: /See the galactic leaderboard/i }));
-    const board = screen.getByRole('dialog', { name: 'Galactic leaderboard' });
-    expect(within(board).getByText('Veteran Alien')).toBeTruthy();
-    const retainedRow = within(board).getByText('Cosmic Dave').closest('.board-row');
-    expect(retainedRow.querySelector('.rank').textContent).toBe('02');
-    expect(retainedRow.querySelector('.record-score').textContent).toMatch(/^96/);
-    expect(within(retainedRow).getByText('Cosmic Test Song — Karaoke')).toBeTruthy();
+    await user.click(screen.getByRole('button', { name: /Meet the galactic hall of fame/i }));
+    const board = screen.getByRole('dialog', { name: 'Hall of Fame' });
+    expect(within(board).getAllByText('Veteran Alien').length).toBeGreaterThan(0);
+    expect(within(board).getAllByText('Cosmic Dave').length).toBeGreaterThan(0);
+    expect(board.querySelectorAll('.hall-character')).toHaveLength(2);
+    expect(board.querySelector('.hall-character').textContent).toContain('Cosmic Dave');
+    expect(board.querySelector('.hall-stat-row').textContent).toContain('96');
+    expect(board.querySelector('.hall-spotlight-info h3').textContent).toBe('Cosmic Dave');
+    await user.click(within(board).getByRole('button',{name:/Spotlight Veteran Alien/i}));
+    expect(board.querySelector('.hall-spotlight-info h3').textContent).toBe('Veteran Alien');
   });
 
   it('leaves the actual YouTube retry action available alongside alternate song selection', async () => {

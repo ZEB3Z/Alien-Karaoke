@@ -54,7 +54,7 @@ function record(value) {
     createdAt: typeof value.createdAt === 'string' ? value.createdAt : new Date().toISOString() };
 }
 function sorted(records) {
-  return records.sort((a, b) => b.score - a.score || a.createdAt.localeCompare(b.createdAt)).slice(0, 50);
+  return records.sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 50);
 }
 export function loadProfile() { return identity(read(STORAGE_KEYS.profile, null)); }
 export function saveProfile(profile) {
@@ -96,7 +96,7 @@ export function addRecord(performance) {
   const valid = record(performance);
   if (!valid) return { ok: false, error: 'This performance could not be saved because its details are incomplete.' };
   const records = loadRecords().filter(item => item.id !== valid.id);
-  records.push(valid);
+  records.unshift(valid);
   const expanded=sorted(records);
   const result=write(STORAGE_KEYS.records,packedRecords(expanded));
   // The public API always returns complete rows, including after quota failure.

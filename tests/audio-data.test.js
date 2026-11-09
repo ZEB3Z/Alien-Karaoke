@@ -17,11 +17,14 @@ test('identity remains recognizable across reload and repeat performance', () =>
   addRecord(performance(1)); addRecord(performance(2, 99));
   assert.equal(loadRecords()[0].profileId, loadProfile().id); assert.equal(loadRecords()[0].photo, profile.photo);
 });
-test('records are ranked, bounded and idempotent; fictional house scores are separate', () => {
+test('records keep the newest fifty plays, not the fifty highest scores; fictional house scores are separate', () => {
   reset(); for(let i=0;i<60;i++) assert.equal(addRecord(performance(i,85+(i%16))).ok,true);
-  const result = loadRecords(); assert.equal(result.length,50); assert.equal(result[0].score,100);
-  for(let i=1;i<result.length;i++) assert.ok(result[i-1].score>=result[i].score);
-  addRecord(performance(15,100)); assert.equal(loadRecords().filter(r=>r.id==='performance-15').length,1);
+  const result = loadRecords(); assert.equal(result.length,50); assert.equal(result[0].id,'performance-59'); assert.equal(result.at(-1).id,'performance-10');
+  for(let i=1;i<result.length;i++) assert.ok(result[i-1].createdAt>=result[i].createdAt);
+  addRecord({...performance(45,100),createdAt:'2026-11-10T00:00:00.000Z'});
+  assert.equal(loadRecords().filter(r=>r.id==='performance-45').length,1);
+  addRecord({...performance(99,85),createdAt:'2026-11-11T00:00:00.000Z'});
+  assert.equal(loadRecords()[0].id,'performance-99'); assert.equal(loadRecords()[0].score,85);
   assert.ok(HOUSE_RECORDS.every(r=>r.house)); assert.ok(loadRecords().every(r=>!r.house));
 });
 test('impossible scores and missing identities cannot enter the leaderboard', () => {
