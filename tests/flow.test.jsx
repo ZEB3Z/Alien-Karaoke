@@ -156,6 +156,21 @@ describe('participant journey', () => {
     expect(loadRecords()).toHaveLength(1);
   });
 
+  it('logs out the current player when the THE BOOTH tab is clicked', async () => {
+    const user = userEvent.setup();
+    saveProfile(fixture);
+    const view = render(<App />);
+    expect(screen.getByRole('button', { name: /WELCOME BACK, EARTHLING/i })).toBeTruthy();
+    await user.click(screen.getByRole('button', { name: /EXPLORE THE BOOTH/i }));
+    await user.click(screen.getByRole('button', { name: 'THE BOOTH' }));
+    expect(screen.getByRole('button', { name: /GET ABDUCTED/i })).toBeTruthy();
+    expect(screen.getByTestId('world').dataset.profile).toBe('');
+    expect(loadProfile()).toBeNull();
+    view.unmount();
+    render(<App />);
+    expect(screen.getByRole('button', { name: /GET ABDUCTED/i })).toBeTruthy();
+  });
+
   it('upgrades a legacy photo identity through the filter preview before allowing abduction', async () => {
     saveProfile({ ...fixture, photo: sourcePhoto, faceVersion: undefined });
     const user = userEvent.setup();

@@ -61,6 +61,9 @@ export function saveProfile(profile) {
   const valid = identity(profile);
   return valid ? write(STORAGE_KEYS.profile, valid) : { ok: false, error: 'Your alien needs a nickname and identity before saving.' };
 }
+export function clearProfile() {
+  try { storage()?.removeItem(STORAGE_KEYS.profile); } catch { /* storage unavailable: nothing to clear */ }
+}
 export function loadRecords() {
   const raw = read(STORAGE_KEYS.records, []);
   if(Array.isArray(raw))return sorted(raw.map(record).filter(Boolean));

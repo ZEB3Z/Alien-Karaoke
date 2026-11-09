@@ -5,7 +5,7 @@ import { isAlienFaceProfile } from './face/texture.js';
 import Registration from './Registration.jsx';
 import YouTubePlayer, { parseYouTubeUrl } from './YouTubePlayer.jsx';
 import audio from './audio.js';
-import { loadProfile, saveProfile, loadRecords, addRecord, loadSettings, saveSettings, randomScore, HOUSE_RECORDS } from './storage.js';
+import { loadProfile, saveProfile, clearProfile, loadRecords, addRecord, loadSettings, saveSettings, randomScore, HOUSE_RECORDS } from './storage.js';
 
 const EVENTS = [
   { kind: 'ufo', text: 'AIR TRAFFIC ALERT · Someone parked a saucer on the dance floor.' },
@@ -110,6 +110,8 @@ export default function App(){
   const start=()=>{unlock();if(isAlienFaceProfile(profile)){setMode('abduction');audio.effect('abduction');}else setDialog('register');};
   const enterClub=useCallback(()=>{setMode('club');audio.effect('teleport');},[]);
   const home=()=>{unlock();setMode('menu');setDialog(null);setCinema(false);micSession.current++;audio.stopMicrophone();setMic(false);setMicPending(false);};
+  // The BOOTH tab returns to the default menu and logs out the current player.
+  const boothTab=()=>{home();clearProfile();setProfile(null);};
   const toggleMic=async()=>{
     unlock();if(mic){audio.stopMicrophone();setMic(false);return;}
     const session=++micSession.current;
@@ -172,7 +174,7 @@ export default function App(){
   return <div ref={gameRef} className={`game game-${mode} ${motion?'reduced-motion':''} ${cinema?'cinema':''}`}>
     <div className="world-wrap"><World mode={mode} profile={profile} levelRef={audio.levelRef} event={event} onTransitionComplete={enterClub} reducedMotion={motion}/></div>
     <div className="world-vignette"/><div className="scanlines" aria-hidden="true"/>
-    <header className="header"><Brand onClick={mode==='performance'?leavePerformance:home}/><nav aria-label="Main navigation"><button className={mode==='menu'?'active':''} onClick={mode==='performance'?leavePerformance:home}>THE BOOTH</button><button onClick={()=>{unlock();setDialog('leaderboard');}}>HALL OF FAME</button><button onClick={()=>{unlock();setDialog('help');}}>HOW TO PLAY <ArrowUpRight size={12}/></button></nav><div className="header-right"><span className="online"><i/> TRANSMITTING LIVE</span><button className="icon-button sound-toggle" onClick={()=>{audio.unlock();setMuted(!muted);}} aria-label={muted?'Enable game sound':'Mute game sound'} title={muted?'Enable game sound':'Mute game sound'}>{muted?<VolumeX size={18}/>:<Volume2 size={18}/>}</button><button className="icon-button" onClick={()=>setDialog('settings')} aria-label="Sound and motion settings"><span className="settings-symbol">≡</span></button></div></header>
+    <header className="header"><Brand onClick={mode==='performance'?leavePerformance:home}/><nav aria-label="Main navigation"><button className={mode==='menu'?'active':''} onClick={mode==='performance'?leavePerformance:boothTab}>THE BOOTH</button><button onClick={()=>{unlock();setDialog('leaderboard');}}>HALL OF FAME</button><button onClick={()=>{unlock();setDialog('help');}}>HOW TO PLAY <ArrowUpRight size={12}/></button></nav><div className="header-right"><span className="online"><i/> TRANSMITTING LIVE</span><button className="icon-button sound-toggle" onClick={()=>{audio.unlock();setMuted(!muted);}} aria-label={muted?'Enable game sound':'Mute game sound'} title={muted?'Enable game sound':'Mute game sound'}>{muted?<VolumeX size={18}/>:<Volume2 size={18}/>}</button><button className="icon-button" onClick={()=>setDialog('settings')} aria-label="Sound and motion settings"><span className="settings-symbol">≡</span></button></div></header>
 
     {mode==='menu'&&<main className="menu">
       <div className="hero-copy"><div className="edition"><span className="mini-star">✦</span> ALL SPECIES. ALL VOICES. ZERO SHAME.</div><h1>ALIEN<br/><span>KARAOKE</span><br/>BOOTH<span className="title-star" aria-hidden="true">✳</span></h1><p className="hero-description">Your face. A new species. One cosmic mic.<br/>The galaxy is ready for your questionable talent.</p><div className="hero-actions"><button className="primary-button" onClick={start}>{profile?'WELCOME BACK, EARTHLING':'GET ABDUCTED'} <ArrowUpRight size={23}/></button><button className="tour-button" onClick={()=>{unlock();setMode('club');}}><Play size={14} fill="currentColor"/> EXPLORE THE BOOTH</button></div><div className="entry-note"><span className="tiny-live"/> FREE ENTRY <span>·</span> NO TALENT REQUIRED <span>·</span> HEADPHONES RECOMMENDED</div></div>
