@@ -2,3 +2,134 @@
 
 /* Landmark filter intake: source crop → one local transform → reusable 3D preview. */
 .reg-preview-tabs{display:flex;gap:5px;padding:5px;background:#090c12;border:1px solid #51475f;border-bottom:0}.reg-preview-tabs button{display:flex;align-items:center;justify-content:center;gap:7px;min-height:34px;flex:1;font:9px 'Courier New',monospace;letter-spacing:.5px;color:#968ba5;border:1px solid transparent}.reg-preview-tabs button[aria-pressed=true]{color:#c7ff54;background:#c7ff5410;border-color:#c7ff5430}.reg-preview-tabs button:hover{color:#d9fdb0}.reg-alien-preview{position:relative;isolation:isolate;overflow:hidden;border:1px solid #51475f;background:radial-gradient(ellipse at 50% 45%,#39442b,#131527 74%)}.reg-alien-preview .avatar-filter-preview{height:330px!important;min-height:280px}.reg-preview-badge{display:flex;align-items:center;justify-content:center;gap:7px;position:absolute;bottom:13px;left:10px;right:10px;pointer-events:none;font:7px 'Courier New',monospace;letter-spacing:1px;color:#cce7af;text-shadow:0 1px 4px #000}.reg-preview-badge>span{width:4px;height:4px;border-radius:50%;background:#c7ff54;box-shadow:0 0 8px #c7ff54}.reg-transform-compare{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#51475f;border:1px solid #51475f}.reg-transform-compare figure{margin:0;min-width:0;background:#10121c}.reg-transform-compare figure>div{height:265px;position:relative;background:#111620;display:flex;align-items:center;justify-content:center;overflow:hidden}.reg-transform-compare img{display:block;width:100%;height:100%;object-fit:cover}.reg-transform-compare .reg-filtered-photo{background:radial-gradient(ellipse at 50% 45%,#34472d,#111620 76%)}.reg-transform-compare .reg-filtered-photo img{object-fit:contain;padding:10px 2px}.reg-transform-compare figcaption{font:8px 'Courier New',monospace;letter-spacing:1px;padding:12px 5px;text-align:center;color:#9b95ae}.reg-transform-compare figure:last-child figcaption{color:#c7ff54}.reg-transformed-only{grid-template-columns:1fr}.reg-transformed-only figure>div{height:330px}.reg-transformed-only .reg-filtered-photo img{width:auto;max-width:100%;padding:15px}.reg-filter-summary{display:flex;gap:9px;align-items:flex-start;padding:13px 0 11px;color:#c7ff54}.reg-filter-summary>svg{margin-top:2px;flex-shrink:0}.reg-filter-summary p{font-size:10px;line-height:1.7;color:#ddd4e6}.reg-filter-summary p>span{color:#958caa}.reg-adjust{display:flex;align-items:center;gap:5px;font:9px 'Courier New',monospace;color:#b3a8c3;padding:4px 0 9px}.reg-adjust:hover{color:#c7ff54}.reg-is-preview .reg-photo-buttons{margin-top:11px;margin-bottom:17px}.reg-camera-busy{padding:28px;text-align:left}.reg-camera-busy>div{display:flex;flex-direction:column;gap:10px;max-width:250px}.reg-camera-busy strong{font-size:10px;line-height:1.65;letter-spacing:.4px;font-weight:400}.reg-camera-busy>div>span{font:8px/1.7 'Courier New',monospace;color:#9b9aa8}.reg-camera-busy progress{display:block;width:100%;height:4px;accent-color:#c7ff54}.reg-cancel-transform{display:flex;margin:13px auto 0;font:8px 'Courier New',monospace;color:#bdadc9;border-bottom:1px solid #756580;padding:5px}.reg-cancel-transform:hover{color:#c7ff54}.reg-generate{margin-top:16px}.reg-is-preview .reg-generate{margin-top:10px}.reg-is-preview .reg-intro{margin-bottom:17px}.reg-is-preview .reg-label{margin-top:17px}@media(max-width:600px){.reg-alien-preview .avatar-filter-preview{height:290px!important;min-height:250px}.reg-transform-compare figure>div{height:225px}.reg-preview-badge{font-size:6px;letter-spacing:.5px}.reg-transform-compare figcaption{font-size:6px;letter-spacing:.5px}.reg-preview-tabs button{font-size:8px}.reg-generate{font-size:10px;letter-spacing:.6px}.reg-privacy{font-size:8px;align-items:flex-start;text-align:center}.reg-privacy>svg{flex-shrink:0;margin-top:1px}.reg-camera-busy{padding:22px}.reg-camera-busy strong{font-size:9px}}
+
+/* Alien player mischief: purely decorative overlay gags layered over the player frame.
+   These only animate CSS transform/opacity on elements that sit ABOVE the iframe — the
+   YouTube host div and iframe are never resized, reparented or re-rendered, so actual
+   video/audio playback is never interrupted. */
+.alien-youtube-frame{position:relative;animation-timing-function:ease-in-out;animation-fill-mode:both}
+.alien-youtube-frame.mischief-shake{animation-name:alien-mischief-shake}
+.alien-youtube-frame.mischief-tilt{animation-name:alien-mischief-tilt;transform-origin:88% 100%}
+.alien-youtube-frame.mischief-steal{animation-name:alien-mischief-steal}
+.alien-youtube-frame.mischief-ufo{animation-name:alien-mischief-ufo}
+@keyframes alien-mischief-shake{
+ 0%,100%{transform:translate(0,0) rotate(0deg)}
+ 10%{transform:translate(-3px,2px) rotate(-.5deg)}
+ 20%{transform:translate(4px,-3px) rotate(.7deg)}
+ 30%{transform:translate(-5px,3px) rotate(-.9deg)}
+ 40%{transform:translate(5px,-2px) rotate(.8deg)}
+ 50%{transform:translate(-4px,3px) rotate(-.6deg)}
+ 60%{transform:translate(4px,-2px) rotate(.6deg)}
+ 70%{transform:translate(-3px,2px) rotate(-.4deg)}
+ 80%{transform:translate(2px,-1px) rotate(.2deg)}
+ 90%{transform:translate(-1px,1px) rotate(-.1deg)}
+}
+@keyframes alien-mischief-tilt{
+ 0%,18%{transform:rotate(0deg) translate(0,0)}
+ 38%{transform:rotate(-6deg) translate(-3px,2px)}
+ 58%{transform:rotate(5deg) translate(3px,-2px)}
+ 78%{transform:rotate(-2deg) translate(0,1px)}
+ 92%{transform:rotate(1deg)}
+ 100%{transform:rotate(0deg) translate(0,0)}
+}
+@keyframes alien-mischief-steal{
+ 0%,14%{transform:translate(0,0) rotate(0deg)}
+ 30%{transform:translate(-16px,-5px) rotate(-3deg)}
+ 44%{transform:translate(-26px,-2px) rotate(-5deg)}
+ 56%{transform:translate(-22px,3px) rotate(-4deg)}
+ 68%{transform:translate(8px,2px) rotate(2.5deg)}
+ 80%{transform:translate(-4px,-1px) rotate(-1deg)}
+ 100%{transform:translate(0,0) rotate(0deg)}
+}
+@keyframes alien-mischief-ufo{
+ 0%,12%{transform:translateY(0) scale(1)}
+ 42%{transform:translateY(-11px) scale(1.018)}
+ 60%{transform:translateY(-14px) scale(1.022)}
+ 76%{transform:translateY(-14px) scale(1.022)}
+ 88%{transform:translateY(-4px) scale(1.006)}
+ 100%{transform:translateY(0) scale(1)}
+}
+
+.alien-mischief-layer{position:absolute;inset:0;overflow:visible;pointer-events:none;z-index:6}
+.mischief-hand{position:absolute;top:50%;width:150px;height:62px;margin-top:-31px;animation-timing-function:ease-in-out;animation-fill-mode:both}
+.mischief-hand-left{left:-96px;animation-name:mischief-hand-reach-left}
+.mischief-hand-right{right:-96px;animation-name:mischief-hand-reach-right}
+.mischief-hand-corner{top:auto;bottom:-16px;right:-66px;left:auto;width:120px;height:52px;margin-top:0;animation-name:mischief-hand-reach-corner}
+.mischief-claw-svg{width:100%;height:100%;filter:drop-shadow(0 4px 8px #000a)}
+@keyframes mischief-hand-reach-left{
+ 0%,100%{transform:translateX(-170px) rotate(0deg);opacity:0}
+ 8%{opacity:1}
+ 24%{transform:translateX(14px) rotate(-8deg);opacity:1}
+ 32%,68%{transform:translateX(0) rotate(5deg);opacity:1}
+ 88%{transform:translateX(-140px) rotate(0deg);opacity:1}
+ 100%{opacity:0}
+}
+@keyframes mischief-hand-reach-right{
+ 0%,100%{transform:translateX(170px) rotate(0deg);opacity:0}
+ 8%{opacity:1}
+ 24%{transform:translateX(-14px) rotate(8deg);opacity:1}
+ 32%,68%{transform:translateX(0) rotate(-5deg);opacity:1}
+ 88%{transform:translateX(140px) rotate(0deg);opacity:1}
+ 100%{opacity:0}
+}
+@keyframes mischief-hand-reach-corner{
+ 0%,100%{transform:translate(56px,36px) rotate(14deg);opacity:0}
+ 14%{opacity:1}
+ 36%{transform:translate(-8px,-6px) rotate(-6deg);opacity:1}
+ 70%{transform:translate(-12px,-10px) rotate(4deg);opacity:1}
+ 90%{transform:translate(46px,30px) rotate(12deg);opacity:1}
+ 100%{opacity:0}
+}
+
+.mischief-burglar{position:absolute;left:-58px;bottom:-10px;width:92px;height:128px;animation-name:mischief-burglar-drag;animation-timing-function:ease-in-out;animation-fill-mode:both}
+.mischief-burglar-svg{width:100%;height:100%;filter:drop-shadow(0 6px 10px #000a)}
+@keyframes mischief-burglar-drag{
+ 0%,100%{transform:translateX(-120px) rotate(0deg);opacity:0}
+ 10%{opacity:1}
+ 30%{transform:translateX(10px) rotate(-4deg);opacity:1}
+ 44%{transform:translateX(22px) rotate(-6deg);opacity:1}
+ 56%{transform:translateX(18px) rotate(-4deg);opacity:1}
+ 68%{transform:translateX(-14px) rotate(3deg);opacity:1}
+ 86%{transform:translateX(-100px) rotate(0deg);opacity:1}
+ 100%{opacity:0}
+}
+
+.mischief-ufo{position:absolute;top:-76px;left:50%;width:160px;margin-left:-80px;display:flex;flex-direction:column;align-items:center;animation-name:mischief-ufo-pass;animation-timing-function:ease-in-out;animation-fill-mode:both}
+.mischief-ufo-svg{width:160px;height:90px;filter:drop-shadow(0 0 14px #d6b8ffaa)}
+.mischief-ufo-beam{width:86px;height:0;margin-top:-6px;background:linear-gradient(180deg,#cbffaa6e,transparent);opacity:0;animation-name:mischief-ufo-beam;animation-timing-function:ease-in-out;animation-fill-mode:both}
+@keyframes mischief-ufo-pass{
+ 0%{transform:translate(-230px,-14px);opacity:0}
+ 10%{opacity:1}
+ 28%{transform:translate(0,0);opacity:1}
+ 64%{transform:translate(0,0);opacity:1}
+ 84%{transform:translate(50px,-8px);opacity:1}
+ 100%{transform:translate(280px,-34px);opacity:0}
+}
+@keyframes mischief-ufo-beam{
+ 0%,22%{height:0;opacity:0}
+ 34%{height:160px;opacity:.5}
+ 62%{height:160px;opacity:.5}
+ 78%{height:40px;opacity:.18}
+ 100%{height:0;opacity:0}
+}
+
+.mischief-caption{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);max-width:82%;text-align:center;font:9px 'Courier New',monospace;letter-spacing:1px;color:#e6fbb2;text-shadow:0 2px 6px #000,0 0 10px #000;background:#0c0f1ccc;border:1px solid #bfff4255;padding:6px 10px;border-radius:2px;opacity:0;animation-name:mischief-caption-fade;animation-timing-function:ease-in-out;animation-fill-mode:both}
+.mischief-caption-ufo{bottom:auto;top:10px}
+@keyframes mischief-caption-fade{
+ 0%,16%{opacity:0;transform:translate(-50%,6px)}
+ 26%,78%{opacity:1;transform:translate(-50%,0)}
+ 92%,100%{opacity:0;transform:translate(-50%,-4px)}
+}
+
+@media(max-width:600px){
+ .mischief-caption{font-size:7px;padding:5px 8px}
+ .mischief-hand{width:110px;height:46px;margin-top:-23px}
+ .mischief-hand-corner{width:92px;height:40px}
+ .mischief-burglar{width:68px;height:94px}
+ .mischief-ufo{width:120px;margin-left:-60px}
+ .mischief-ufo-svg{width:120px;height:68px}
+}
+@media (prefers-reduced-motion: reduce){
+ .alien-youtube-frame.mischief-shake,.alien-youtube-frame.mischief-tilt,.alien-youtube-frame.mischief-steal,.alien-youtube-frame.mischief-ufo{animation:none}
+ .mischief-hand,.mischief-burglar,.mischief-ufo,.mischief-caption{animation:none;display:none}
+}
