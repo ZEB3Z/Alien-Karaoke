@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import './player-chaos.css';
 
 // Decorative effects only: never call, replace, or cover the YouTube API player.
-export const PLAYER_PRANKS = ['grab', 'shake', 'rotate', 'steal', 'abduct'];
+export const PLAYER_PRANKS = ['grab', 'shake', 'rotate', 'steal', 'abduct', 'portal', 'shrink', 'stampede'];
 export const PRANK_DURATION_MS = 3400;
 
 const PRANK_LABELS = {
@@ -11,6 +11,9 @@ const PRANK_LABELS = {
   rotate: 'TECH SUPPORT: TRY SPINNING IT',
   steal: 'WE ARE BORROWING YOUR TV',
   abduct: 'SIGNAL ABDUCTION IN PROGRESS',
+  portal: 'ILLEGAL WORMHOLE / NO REFUNDS',
+  shrink: 'DID ANYONE ORDER POCKET-SIZE TV?',
+  stampede: 'EMERGENCY: THREE ALIENS, ONE SCREEN',
 };
 
 export function usePlayerChaos(enabled, videoId) {
@@ -97,24 +100,42 @@ function Saucer() {
   </svg>;
 }
 
+const PRANK_COMICS = {
+  grab: 'YOINK!', shake: 'BLORP BLORP!', rotate: 'WHEEEEE!',
+  steal: 'MINE NOW!', abduct: 'BEAM ME UP!', portal: 'WRONG DIMENSION!',
+  shrink: 'TINY TV!', stampede: 'RUN, GREG!',
+};
+
+/** Never clone, replace, crop, remount, pause, or capture the real YouTube iframe.
+ * The "stolen screen" below is intentionally an empty translucent outline.
+ * Every pixel is decorative, all pointers pass straight through to YouTube.
+ */
 export default function PlayerChaos({ prank }) {
   if (!prank) return null;
   const { kind } = prank;
   return <div className={`player-chaos-layer player-chaos--${kind}`} aria-hidden="true" key={prank.id}>
-    {(kind === 'grab' || kind === 'steal') && <>
+    <span className="chaos-edge chaos-edge--top" />
+    <span className="chaos-edge chaos-edge--bottom" />
+    {['grab', 'steal', 'portal', 'shrink', 'abduct'].includes(kind) && <div className="chaos-ghost-screen"><span className="chaos-ghost-label">PROPERTY OF BLORP</span><span className="chaos-ghost-play">▶</span><i /></div>}
+    {['grab', 'steal', 'shake'].includes(kind) && <>
       <LittleAlien side="left" />
       <LittleAlien side="right" color="violet" />
     </>}
-    {(kind === 'shake' || kind === 'rotate') && <LittleAlien side={kind === 'shake' ? 'right' : 'left'} />}
-    {kind === 'abduct' && <>
+    {kind === 'rotate' && <LittleAlien side="left" />}
+    {['abduct', 'portal', 'shrink'].includes(kind) && <>
       <div className="chaos-tractor-beam" />
       <Saucer />
-      <LittleAlien side="right" />
+      <LittleAlien side="right" color="violet" />
     </>}
+    {kind === 'stampede' && <div className="chaos-stampede-crew"><LittleAlien side="left" /><LittleAlien side="left" color="violet" /><LittleAlien side="left" /></div>}
+    {['portal', 'shrink'].includes(kind) && <div className="chaos-portal-ring"><div className="chaos-portal-ring-inner" /></div>}
+    {kind === 'rotate' && <div className="chaos-gyro"><span>ANTI-GRAVITY / 0.7G</span></div>}
+    {kind === 'shake' && <div className="chaos-quake"><i /><i /><i /><i /><i /></div>}
+    {kind === 'stampede' && <div className="chaos-dust"><i /><i /><i /><i /></div>}
     <div className="chaos-static chaos-static--one" />
     <div className="chaos-static chaos-static--two" />
     <div className="chaos-static chaos-static--three" />
     <span className="chaos-warning"><span className="chaos-warning-dot" /> {PRANK_LABELS[kind]}</span>
-    <span className="chaos-comic">{kind === 'grab' ? 'YOINK!' : kind === 'shake' ? 'BLORP BLORP!' : kind === 'rotate' ? 'WHEEEEE!' : kind === 'steal' ? 'MINE NOW!' : 'BEAM ME UP!'}</span>
+    <span className="chaos-comic">{PRANK_COMICS[kind]}</span>
   </div>;
 }

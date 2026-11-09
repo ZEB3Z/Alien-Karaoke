@@ -42,6 +42,7 @@ export function hallMembers(records) {
       if (!original.profile.photo && record.photo) {
         original.profile.photo = record.photo;
         original.profile.faceVersion = record.faceVersion;
+        original.profile.style = record.style;
       }
       continue;
     }
@@ -52,7 +53,7 @@ export function hallMembers(records) {
       title: ALIEN_TITLES[number % ALIEN_TITLES.length],
       quote: ALIEN_QUOTES[Math.floor(number / 7) % ALIEN_QUOTES.length],
       accent: ACCENTS[number % ACCENTS.length],
-      profile: { nickname: record.nickname, photo: record.photo, faceVersion: record.faceVersion },
+      profile: { nickname: record.nickname, photo: record.photo, faceVersion: record.faceVersion, style: record.style },
     });
   }
   return [...members.values()];

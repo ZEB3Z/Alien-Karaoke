@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Camera, Upload, X, RotateCcw, Check, ScanFace, ArrowRight, ShieldCheck, LoaderCircle, Move, ZoomIn, Sparkles, ChevronLeft } from 'lucide-react';
 import { transformAlienFace } from './face/faceFilter.js';
 import { AvatarPreview } from './World.jsx';
+import { SKINS, ACCESSORIES, OUTFITS, ACCENTS, normalizeAlienStyle } from './alienStyle.js';
 import './media.css';
 
 const MAX_FILE_SIZE = 15 * 1024 * 1024;
@@ -11,6 +12,7 @@ export default function Registration({ profile, onComplete, onCancel, onSound })
   const existing = profile?.faceVersion === FACE_VERSION && profile?.photo
     ? { photo: profile.photo, faceVersion: profile.faceVersion, faceMeta: profile.faceMeta || {} } : null;
   const [nickname, setNickname] = useState(profile?.nickname || '');
+  const [alienStyle, setAlienStyle] = useState(() => normalizeAlienStyle(profile?.style));
   // A transformed texture is never fed back into the detector as a human source.
   const [image, setImage] = useState(existing ? '' : profile?.photo || '');
   const [generated, setGenerated] = useState(existing);
@@ -103,7 +105,7 @@ export default function Registration({ profile, onComplete, onCancel, onSound })
   }, [cameraOn]);
 
   useEffect(() => {
-    if (isPreview) dialogRef.current?.querySelector('[data-filter-confirm]')?.focus();
+    if (isPreview) { dialogRef.current?.scrollTo?.({top:0}); dialogRef.current?.querySelector('.reg-preview-tabs button')?.focus({preventScroll:true}); }
   }, [isPreview]);
 
   async function startCamera() {
@@ -208,6 +210,7 @@ export default function Registration({ profile, onComplete, onCancel, onSound })
       photo: generated.photo,
       faceVersion: generated.faceVersion,
       faceMeta: generated.faceMeta,
+      style: alienStyle,
       createdAt: profile?.createdAt || new Date().toISOString(),
     });
   }
@@ -272,7 +275,8 @@ export default function Registration({ profile, onComplete, onCancel, onSound })
   const width = imageRatio >= 1 ? 100 * imageRatio * zoom : 100 * zoom;
   const height = imageRatio >= 1 ? 100 * zoom : 100 / imageRatio * zoom;
   const changeCrop = (update) => { invalidatePreview(); update(); };
-  const previewProfile = generated ? { nickname: nickname.trim() || 'Your alien', ...generated } : null;
+  const previewProfile = generated ? { nickname: nickname.trim() || 'Your alien', ...generated, style: alienStyle } : null;
+  const changeStyle = (name, value) => { setAlienStyle(current => ({ ...current, [name]: value })); onSound?.('click'); };
 
   return <div className="registration-backdrop">
     <section className={`registration-dialog ${isPreview ? 'reg-is-preview' : ''}`} role="dialog" aria-modal="true" aria-labelledby="registration-title" ref={dialogRef}>
@@ -293,7 +297,16 @@ export default function Registration({ profile, onComplete, onCancel, onSound })
             {sourceCrop && <figure><div><img src={sourceCrop} alt="Original face before transformation" /></div><figcaption>HUMAN FREQUENCY</figcaption></figure>}
             <figure><div className="reg-filtered-photo"><img src={generated.photo} alt="Your transformed alien face" /></div><figcaption>ALIEN FREQUENCY</figcaption></figure>
           </div>}
-          <div className="reg-filter-summary"><Check size={14} /><p>Face-shaped warp. Bigger eyes. Natural green shading.<br /><span>Your expression and facial details stay yours.</span></p></div>
+          <section className="reg-customizer" aria-label="Alien customization">
+            <div className="reg-customizer-title"><Sparkles size={16} /> <strong>04 / MUTATE YOUR LOOK</strong><span>LIVE 3D</span></div>
+            <p className="reg-customizer-help">Pick your species color, ridiculous headgear, suit and neon trim. Your choices appear on your alien and in the Hall of Fame.</p>
+            <fieldset className="reg-style-field"><legend>SKIN / SPECIES COLOR</legend><div className="reg-color-grid">{SKINS.map(option => <button key={option.id} type="button" className="reg-color-option" aria-label={`Skin: ${option.label}`} aria-pressed={alienStyle.skin === option.id} onClick={() => changeStyle('skin', option.id)}><span className="reg-color-dot" style={{ '--swatch': option.hex }} /><span>{option.label}</span></button>)}</div></fieldset>
+            <fieldset className="reg-style-field"><legend>HEAD ACCESSORY</legend><div className="reg-accessory-grid">{ACCESSORIES.map(option => <button key={option.id} type="button" aria-pressed={alienStyle.accessory === option.id} className="reg-accessory-option" onClick={() => changeStyle('accessory', option.id)}><span aria-hidden="true">{option.icon}</span><small>{option.label}</small></button>)}</div></fieldset>
+            <fieldset className="reg-style-field"><legend>SPACE SUIT</legend><div className="reg-palette-row">{OUTFITS.map(option => <button key={option.id} type="button" className="reg-palette-option" aria-label={`Suit: ${option.label}`} aria-pressed={alienStyle.outfit === option.id} title={option.label} onClick={() => changeStyle('outfit', option.id)} style={{ '--swatch': option.hex }} />)}</div></fieldset>
+            <fieldset className="reg-style-field"><legend>NEON ACCESSORY COLOR</legend><div className="reg-palette-row">{ACCENTS.map(option => <button key={option.id} type="button" className="reg-palette-option" aria-label={`Neon: ${option.label}`} aria-pressed={alienStyle.accent === option.id} title={option.label} onClick={() => changeStyle('accent', option.id)} style={{ '--swatch': option.hex }} />)}</div></fieldset>
+            <div className="reg-customizer-tip">Your face stays yours. Only the alien styling changes.</div>
+          </section>
+          <div className="reg-filter-summary"><Check size={14} /><p>Face-shaped warp. Bigger eyes. Your new cosmic colors.<br /><span>Your expression and facial details stay yours.</span></p></div>
           <button type="button" className="reg-adjust" onClick={() => { setPreviewOpen(false); setError(''); }}><ChevronLeft size={15} /> {image ? 'ADJUST PHOTO' : 'CHOOSE ANOTHER PHOTO'}</button>
         </> : <>
           <div className="reg-label"><span>02</span> SCAN YOUR HUMAN FACE</div>

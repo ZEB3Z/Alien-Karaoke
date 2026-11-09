@@ -1,3 +1,5 @@
+import { normalizeAlienStyle } from './alienStyle.js';
+
 /** Device-local data. Photos are never sent to a server. */
 const PREFIX = 'alien-karaoke.v1.';
 export const STORAGE_KEYS = Object.freeze({ profile: `${PREFIX}profile`, records: `${PREFIX}records`, settings: `${PREFIX}settings` });
@@ -40,7 +42,7 @@ function identity(value) {
   const nickname = text(value.nickname, 24);
   const id = text(value.id, 80);
   if (!nickname || !id) return null;
-  return { id, nickname, photo: photo(value.photo), ...faceDetails(value), createdAt: typeof value.createdAt === 'string' ? value.createdAt : new Date().toISOString() };
+  return { id, nickname, photo: photo(value.photo), ...faceDetails(value), ...(value.style ? { style: normalizeAlienStyle(value.style) } : {}), createdAt: typeof value.createdAt === 'string' ? value.createdAt : new Date().toISOString() };
 }
 function record(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
@@ -50,7 +52,7 @@ function record(value) {
   const id = text(value.id, 80);
   const profileId = text(value.profileId, 80);
   if (!id || !profileId || !nickname || !song || !Number.isInteger(score) || score < 85 || score > 100) return null;
-  return { id, profileId, nickname, photo: photo(value.photo), ...faceDetails(value), song, videoId: /^[\w-]{11}$/.test(value.videoId || '') ? value.videoId : '', score,
+  return { id, profileId, nickname, photo: photo(value.photo), ...faceDetails(value), ...(value.style ? { style: normalizeAlienStyle(value.style) } : {}), song, videoId: /^[\w-]{11}$/.test(value.videoId || '') ? value.videoId : '', score,
     createdAt: typeof value.createdAt === 'string' ? value.createdAt : new Date().toISOString() };
 }
 function sorted(records) {
@@ -118,7 +120,7 @@ export function saveSettings(value) {
   settings.reducedMotion = Boolean(settings.reducedMotion);
   return write(STORAGE_KEYS.settings, settings);
 }
-/** Entertainment score only: a fair uniform integer in [85, 100], never an analysis of singing. */
+/** Silly arcade scoring only; no microphone or voice-performance analysis. */
 export function randomScore() {
   const data = new Uint8Array(1);
   if (globalThis.crypto?.getRandomValues) {

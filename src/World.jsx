@@ -2,6 +2,7 @@ import React, { Component, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { createFacePatchData, faceTextureFingerprint, isAlienFaceProfile } from './face/texture.js';
+import { normalizeAlienStyle, SKINS, OUTFITS, ACCENTS, styleChoice, styleFingerprint } from './alienStyle.js';
 
 const TAU = Math.PI * 2;
 const GREEN = '#b3ec63';
@@ -47,10 +48,67 @@ function disposeAlienModel(model) {
   geometry.forEach(resource=>resource.dispose());materials.forEach(resource=>resource.dispose());
 }
 
-function makeAlien({color=GREEN, seed=0, photoTexture=null, judge=false}={}) {
+// Accessories are real low-poly meshes parented to the animated head, not flat stickers.
+function dressAlien(group, head, skin, outfit, accent, style) {
+  const bright = new THREE.MeshStandardMaterial({ color: accent, emissive: accent, emissiveIntensity: .28, roughness: .38, flatShading: true });
+  const cloth = new THREE.MeshStandardMaterial({ color: outfit, roughness: .64, flatShading: true });
+  const shade = new THREE.MeshStandardMaterial({ color: '#20243a', metalness: .25, roughness: .42, flatShading: true });
+  const glass = new THREE.MeshStandardMaterial({ color: accent, transparent: true, opacity: .46, metalness: .24, roughness: .19, emissive: accent, emissiveIntensity: .16, depthWrite: false, side: THREE.DoubleSide });
+  // Small torso plate, chunky belt, and glowing arcade emblem.
+  addMesh(group, ball, cloth, [0, 1.4, .12], [.39, .39, .27]);
+  addMesh(group, new THREE.TorusGeometry(.34, .05, 5, 14), bright, [0, 1.03, .015], [1, 1, .72], [Math.PI / 2, 0, 0]);
+  addMesh(group, new THREE.OctahedronGeometry(.13, 0), bright, [0, 1.49, .387], [.85, 1.15, .55]);
+  for (const side of [-1, 1]) addMesh(group, ball, cloth, [side * .29, 1.7, 0], [.18, .13, .28]);
+
+  if (style.accessory === 'crown') {
+    addMesh(head, new THREE.CylinderGeometry(.59, .62, .19, 9), bright, [0, 1.02, 0]);
+    for (let i = 0; i < 7; i++) {
+      const angle = i * Math.PI * 2 / 7;
+      addMesh(head, new THREE.ConeGeometry(.15, .38, 4), bright, [Math.cos(angle) * .49, 1.27, Math.sin(angle) * .49], [1, 1, 1], [0, angle, 0]);
+    }
+    addMesh(head, ball, MAT.pink, [0, 1.09, .61], [.1, .1, .05]);
+  } else if (style.accessory === 'headphones') {
+    addMesh(head, new THREE.TorusGeometry(.87, .075, 8, 28, Math.PI), shade, [0, .23, .02], [1, 1, 1], [0, 0, 0]);
+    for (const side of [-1, 1]) {
+      addMesh(head, ball, shade, [side * .78, .09, 0], [.18, .32, .28]);
+      addMesh(head, ball, bright, [side * .90, .09, .035], [.07, .22, .18]);
+    }
+  } else if (style.accessory === 'visor') {
+    addMesh(head, ball, shade, [0, .18, .62], [.76, .24, .15]);
+    addMesh(head, ball, glass, [0, .18, .75], [.70, .205, .065]);
+    addMesh(head, new THREE.BoxGeometry(.92, .026, .04), bright, [0, -.01, .76]);
+  } else if (style.accessory === 'party') {
+    addMesh(head, new THREE.ConeGeometry(.43, 1.06, 7), cloth, [.13, 1.31, -.02], [1, 1, 1], [0, 0, -.17]);
+    addMesh(head, new THREE.TorusGeometry(.44, .05, 5, 10), bright, [.13, .80, -.02], [1, 1, 1], [Math.PI / 2, 0, 0]);
+    addMesh(head, ball, bright, [.23, 1.87, -.02], [.15, .15, .15]);
+  } else if (style.accessory === 'halo') {
+    addMesh(head, new THREE.TorusGeometry(.74, .075, 8, 28), bright, [0, 1.38, 0], [1, .40, 1]);
+    addMesh(head, new THREE.CylinderGeometry(.025, .025, .37, 6), shade, [0, 1.06, -.19]);
+  } else if (style.accessory === 'cap') {
+    addMesh(head, new THREE.SphereGeometry(.77, 12, 6, 0, Math.PI * 2, 0, Math.PI / 2), cloth, [0, .48, 0], [1, .95, 1]);
+    addMesh(head, ball, bright, [0, .56, .63], [.55, .08, .31]);
+    addMesh(head, ball, shade, [0, 1.2, -.02], [.12, .11, .12]);
+  } else if (style.accessory === 'antennae') {
+    for (const side of [-1, 1]) {
+      addMesh(head, new THREE.CylinderGeometry(.04, .06, .67, 6), skin, [side * .60, 1.13, .05], [1, 1, 1], [0, 0, -side * .38]);
+      addMesh(head, ball, bright, [side * .73, 1.49, .05], [.21, .21, .21]);
+      addMesh(head, ball, MAT.pink, [side * .78, 1.54, .18], [.045, .045, .04]);
+    }
+  } else if (style.accessory === 'bow') {
+    addMesh(head, new THREE.BoxGeometry(.39, .27, .12), cloth, [-.63, .77, .42], [1, 1, 1], [0, -.34, .45]);
+    addMesh(head, new THREE.BoxGeometry(.39, .27, .12), cloth, [-.13, .77, .62], [1, 1, 1], [0, .34, -.45]);
+    addMesh(head, ball, bright, [-.38, .77, .55], [.12, .13, .11]);
+  }
+}
+
+function makeAlien({color=GREEN, seed=0, photoTexture=null, judge=false, style=null}={}) {
+  const chosen=normalizeAlienStyle(style);
+  if(style) color=styleChoice(SKINS, chosen.skin).hex;
+  const suitColor=style ? styleChoice(OUTFITS, chosen.outfit).hex : (judge?'#fbb7e6':seed%3===0?'#705ac7':'#c7da8a');
+  const accentColor=style ? styleChoice(ACCENTS, chosen.accent).hex : '#faff82';
   const group=new THREE.Group();
   const skin=new THREE.MeshStandardMaterial({color,roughness:.57,flatShading:true});
-  const shirt=new THREE.MeshStandardMaterial({color:judge?'#fbb7e6':seed%3===0?'#705ac7':'#c7da8a',roughness:.7,flatShading:true});
+  const shirt=new THREE.MeshStandardMaterial({color:suitColor,roughness:.7,flatShading:true});
   const torso=addMesh(group,ball,skin,[0,1.38,0],[.38,.52,.28]);
   const head=new THREE.Group(); head.position.set(0,2.47,.02); group.add(head);
   addMesh(head,ball,skin,[0,0,0],[.79,.95,.7]);
@@ -82,6 +140,7 @@ function makeAlien({color=GREEN, seed=0, photoTexture=null, judge=false}={}) {
     addMesh(head,new THREE.CylinderGeometry(.026,.04,.4,5),skin,[side*.42,.88,-.04],[1,1,1],[0,0,-side*.42]);
     addMesh(head,ball,MAT.pink,[side*.5,1.07,-.04],[.09,.09,.09]);
   }
+  if(style&&!judge) dressAlien(group,head,skin,suitColor,accentColor,chosen);
   if(judge){
     addMesh(head,new THREE.CylinderGeometry(.5,.6,.15,8),MAT.purple,[0,.92,0]);
     addMesh(head,new THREE.CylinderGeometry(.35,.44,.52,8),MAT.purple,[0,1.2,0]);
@@ -91,10 +150,20 @@ function makeAlien({color=GREEN, seed=0, photoTexture=null, judge=false}={}) {
   return group;
 }
 
-function textureFromPhoto(img){
+function textureFromPhoto(img, skin='lime'){
+  // Tint the already-transformed, alpha-feathered alien face, without redetecting it.
+  // Canvas hue rotation preserves expression and fine facial shading.
+  const hue=styleChoice(SKINS, skin).hue;
+  let source=img;
+  if(hue && typeof document !== 'undefined') {
+    const canvas=document.createElement('canvas');
+    canvas.width=img.naturalWidth||img.width;canvas.height=img.naturalHeight||img.height;
+    const ctx=canvas.getContext('2d');
+    if(ctx) { ctx.filter=`hue-rotate(${hue}deg) saturate(1.08)`;ctx.drawImage(img,0,0);source=canvas; }
+  }
   // The prepared 512×640 atlas already contains its landmark warp, skin
   // treatment and feathered alpha. Never crop or paste its source photo again.
-  const texture=new THREE.Texture(img);texture.needsUpdate=true;
+  const texture=new THREE.Texture(source);texture.needsUpdate=true;
   texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=4;
   texture.minFilter=THREE.LinearMipmapLinearFilter;texture.magFilter=THREE.LinearFilter;
   texture.wrapS=texture.wrapT=THREE.ClampToEdgeWrapping;
@@ -103,6 +172,7 @@ function textureFromPhoto(img){
 
 function useFaceTexture(profile) {
   const photo=isAlienFaceProfile(profile)?profile.photo:null;
+  const skin=normalizeAlienStyle(profile?.style).skin;
   const [texture,setTexture]=useState(null);
   useEffect(()=>{
     setTexture(null);
@@ -111,17 +181,19 @@ function useFaceTexture(profile) {
     const img=new Image();
     img.onload=()=>{
       if(disposed)return;
-      tex=textureFromPhoto(img);setTexture(tex);
+      tex=textureFromPhoto(img,skin);setTexture(tex);
     };
     img.src=photo;
     return()=>{disposed=true;tex?.dispose();};
-  },[photo]);
+  },[photo,skin]);
   return texture;
 }
 
 function Alien({position=[0,0,0],scale=1,seed=0,color=GREEN,hero=false,profile,mode,levelRef,clockStart,reducedMotion=false,judge=false,event}) {
   const texture=useFaceTexture(hero?profile:null);
-  const model=useMemo(()=>makeAlien({seed,color,judge}),[seed,color,judge]);
+  const style=hero?profile?.style:null;
+  const styleKey=styleFingerprint(style);
+  const model=useMemo(()=>makeAlien({seed,color,judge,style}),[seed,color,judge,styleKey]);
   useEffect(()=>()=>disposeAlienModel(model),[model]);
   const base=useRef(position);
   const restPosition=useRef(new THREE.Vector3(...position));const restScale=useRef(scale);
@@ -531,7 +603,8 @@ export function AlienPortrait({profile,size=64,seed=0,variant='head'}){
   const [url,setUrl]=useState('');
   useEffect(()=>{
     const photo=isAlienFaceProfile(profile)?profile.photo:null;
-    let cancelled=false;const key=`${faceTextureFingerprint(photo||'')}:${profile?.faceVersion||'default'}:${seed}:${variant}`;
+    const style=profile?.style;
+    let cancelled=false;const key=`${faceTextureFingerprint(photo||'')}:${profile?.faceVersion||'default'}:${seed}:${variant}:${styleFingerprint(style)}`;
     setUrl('');
     if(portraitCache.has(key)){setUrl(portraitCache.get(key));return;}
     const render=(texture=null)=>{
@@ -541,15 +614,15 @@ export function AlienPortrait({profile,size=64,seed=0,variant='head'}){
         renderer=new THREE.WebGLRenderer({alpha:true,antialias:true,preserveDrawingBuffer:true});renderer.setSize(variant==='full'?288:128,variant==='full'?288:128);renderer.setPixelRatio(1);renderer.outputColorSpace=THREE.SRGBColorSpace;
         renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;
         const scene=new THREE.Scene();const camera=new THREE.PerspectiveCamera(variant==='full'?37:35,1,.1,20);if(variant==='full'){camera.position.set(.25,1.85,5.8);camera.lookAt(0,1.85,0);}else{camera.position.set(.4,2.5,5.2);camera.lookAt(0,2,0);}
-        alien=makeAlien({seed,photoTexture:texture});alien.rotation.y=-.12;scene.add(alien);
+        alien=makeAlien({seed,photoTexture:texture,style});alien.rotation.y=-.12;scene.add(alien);
         scene.add(new THREE.AmbientLight('#c6c8ee',1.25));scene.add(new THREE.HemisphereLight('#e2d7fa','#464368',2));const light=new THREE.DirectionalLight('#f4f0c9',3.1);light.position.set(3,9,8);scene.add(light);
         renderer.render(scene,camera);const result=renderer.domElement.toDataURL('image/png');portraitCache.set(key,result);if(!cancelled)setUrl(result);
         if(portraitCache.size>PORTRAIT_CACHE_LIMIT)portraitCache.delete(portraitCache.keys().next().value);
       }catch{if(!cancelled)setUrl('');}
       finally{renderer?.dispose();renderer?.forceContextLoss();if(alien)disposeAlienModel(alien);texture?.dispose();}
     };
-    if(photo){const img=new Image();img.onload=()=>render(textureFromPhoto(img));img.onerror=()=>render();img.src=photo;}else render();
+    if(photo){const img=new Image();img.onload=()=>render(textureFromPhoto(img,normalizeAlienStyle(style).skin));img.onerror=()=>render();img.src=photo;}else render();
     return()=>{cancelled=true;};
-  },[profile?.photo,profile?.faceVersion,seed,variant]);
+  },[profile?.photo,profile?.faceVersion,profile?.style?.skin,profile?.style?.accessory,profile?.style?.outfit,profile?.style?.accent,seed,variant]);
   return url?<img className="alien-portrait" src={url} alt={`${profile?.nickname||'Galactic singer'}'s ${variant==='full'?'full-body ':''}3D alien`} width={size} height={size}/>:variant==='full'?<svg className="alien-portrait" width={size} height={size} viewBox="0 0 100 130" role="img" aria-label={`${profile?.nickname||'Galactic singer'} alien avatar`}><path fill="#b8e87b" d="M44 65h12l8 39 10 25-24-13-24 13 10-25zM32 72 14 103l7 4 25-34zm36 0 18 31-7 4-25-34z"/><ellipse cx="50" cy="40" rx="36" ry="40" fill="#b8e87b"/><ellipse cx="36" cy="40" rx="9" ry="15" transform="rotate(-28 36 40)" fill="#101629"/><ellipse cx="64" cy="40" rx="9" ry="15" transform="rotate(28 64 40)" fill="#101629"/></svg>:<svg className="alien-portrait" width={size} height={size} viewBox="0 0 64 64" role="img" aria-label="Alien portrait"><path fill="#b8e87b" d="M22 58l3-22h14l3 22-10-4z"/><ellipse fill="#b8e87b" cx="32" cy="24" rx="19" ry="22"/><ellipse fill="#172034" cx="24" cy="24" rx="5" ry="8" transform="rotate(-25 24 24)"/><ellipse fill="#172034" cx="40" cy="24" rx="5" ry="8" transform="rotate(25 40 24)"/></svg>;
 }
