@@ -208,6 +208,7 @@ function Alien({position=[0,0,0],scale=1,seed=0,color=GREEN,hero=false,profile,m
   useFrame(({clock},delta)=>{
     const t=clock.elapsedTime, q=t*1.9+seed*2.15, parts=model.userData;
     const level=levelRef?.current||0; const dance=mode==='performance'||mode==='results';
+    const performing=hero&&mode==='performance';
     const amp=reducedMotion?.08:1;
     destination.set(...base.current);
     const travel=restPosition.current.distanceTo(destination);
@@ -216,6 +217,9 @@ function Alien({position=[0,0,0],scale=1,seed=0,color=GREEN,hero=false,profile,m
     model.position.copy(restPosition.current);
     model.scale.setScalar(restScale.current);
     model.rotation.y=hero?-.23:Math.sin(seed*1.8)*.8;
+    // Reset the extra dance joints so switching scenes never freezes a pose.
+    parts.torso.rotation.z=0;
+    parts.head.rotation.x=0;
     if(!reducedMotion){
       model.position.y+=Math.abs(Math.sin(q*(dance?1.5:.65)))*.08;
       model.rotation.z=Math.sin(q)*.045*(dance?2.5:1);
@@ -238,21 +242,25 @@ function Alien({position=[0,0,0],scale=1,seed=0,color=GREEN,hero=false,profile,m
         model.rotation.y+=Math.sin(t*.4)*.25;
         if(Math.sin(t*.13)>.8)model.position.z+=.7;
       }
-      if(hero&&mode==='performance'&&travel<=.15){
-        // Karaoke dance: bouncy two-step with alternating arm pumps, hip sway and head bob.
-        const b=t*6+level*.5;
-        model.position.y+=Math.abs(Math.sin(b))*.17+level*.1;
-        model.position.x+=Math.sin(b*.5)*.18;
-        model.rotation.z=Math.sin(b)*.09;
-        model.rotation.y+=Math.sin(b*.5)*.3;
-        parts.head.rotation.z=Math.sin(b)*.18;
-        parts.head.rotation.x=Math.abs(Math.sin(b))*.14;
-        parts.arms[0].rotation.z=-.85-Math.sin(b)*.45-level*.5;
-        parts.arms[1].rotation.z=.85+Math.sin(b+Math.PI)*.45+level*.5;
-        parts.arms[0].rotation.x=Math.sin(b*.5)*.35;
-        parts.arms[1].rotation.x=-Math.sin(b*.5)*.35;
-        parts.legs[0].rotation.x=Math.sin(b)*.3;
-        parts.legs[1].rotation.x=-Math.sin(b)*.3;
+      if(performing){
+        // A continuous, deliberately simple 3D two-step. It doesn't rely on a
+        // microphone or touch the YouTube player. Mic input adds a little pep.
+        const beat=t*3.7;
+        const step=Math.sin(beat*.5);
+        const energy=.85+Math.min(Math.max(level,0),1)*.35;
+        model.position.x+=step*.18;
+        model.position.y+=(Math.max(0,Math.sin(beat))*.18+.035)*energy;
+        model.rotation.z=Math.sin(beat*.5)*.15;
+        model.rotation.y+=step*.15;
+        parts.torso.rotation.z=step*.13;
+        parts.head.rotation.z=Math.sin(beat*.5+.45)*.19;
+        parts.head.rotation.x=Math.sin(beat)*.075;
+        parts.arms[0].rotation.z=-.78+Math.sin(beat)*.44;
+        parts.arms[1].rotation.z=.78-Math.sin(beat)*.44;
+        parts.arms[0].rotation.x=-.18+step*.35;
+        parts.arms[1].rotation.x=-.18-step*.35;
+        parts.legs[0].rotation.x=Math.sin(beat)*.40;
+        parts.legs[1].rotation.x=-Math.sin(beat)*.40;
       }
       const eventTime=performance.now()/1000-eventStart.current;
       if(event?.kind==='parade'&&!hero&&!judge&&eventTime<7){
@@ -266,6 +274,18 @@ function Alien({position=[0,0,0],scale=1,seed=0,color=GREEN,hero=false,profile,m
       if(event?.kind==='visitor'&&hero&&eventTime<7){
         model.position.z+=Math.sin(eventTime/7*Math.PI)*1.7;
         parts.arms[1].rotation.z=2+Math.sin(eventTime*8)*.25;
+      }
+    }else{
+      // Gentle motion is intentionally quiet, not a frozen performance pose.
+      model.rotation.z=0;
+      parts.head.rotation.set(0,0,0);
+      parts.arms[0].rotation.set(0,0,-.12);
+      parts.arms[1].rotation.set(0,0,.12);
+      parts.legs[0].rotation.x=0;
+      parts.legs[1].rotation.x=0;
+      if(performing){
+        model.position.y+=Math.sin(t*1.4)*.018;
+        parts.head.rotation.z=Math.sin(t*1.1)*.025;
       }
     }
     if(hero&&mode==='abduction'){

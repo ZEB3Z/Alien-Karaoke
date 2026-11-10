@@ -39,8 +39,26 @@
 .recent-empty strong{font:900 20px var(--display)}
 .recent-empty span{font:9px/1.5 var(--mono);color:#a9a6b9}
 
-/* Singer portrait dances during the performance */
-.dancing-portrait{display:inline-flex;transform-origin:50% 100%;animation:portrait-dance .9s ease-in-out infinite}
-@keyframes portrait-dance{0%,100%{transform:translateY(0) rotate(-6deg)}25%{transform:translateY(-5px) rotate(0)}50%{transform:translateY(0) rotate(6deg)}75%{transform:translateY(-5px) rotate(0)}}
-.reduced-motion .dancing-portrait{animation:none}
-@media(prefers-reduced-motion:reduce){.dancing-portrait{animation:none}}
+/* A little loop for the on-air singer's portrait; never animates the video. */
+.performer-dancing>.alien-portrait{
+  transform-origin:50% 90%;
+  animation:alien-singer-two-step 1.7s ease-in-out infinite;
+  will-change:transform;
+}
+.performer-gentle>.alien-portrait{
+  transform-origin:50% 90%;
+  animation:alien-singer-breathe 3.4s ease-in-out infinite;
+}
+@keyframes alien-singer-two-step{
+  0%,100%{transform:translate(0,0) rotate(-5deg)}
+  25%{transform:translate(2px,-5px) rotate(5deg)}
+  50%{transform:translate(0,-1px) rotate(-3deg)}
+  75%{transform:translate(-2px,-6px) rotate(5deg)}
+}
+@keyframes alien-singer-breathe{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-2px)}
+}
+@media(prefers-reduced-motion:reduce){
+  .performer-dancing>.alien-portrait,.performer-gentle>.alien-portrait{animation:none}
+}
