@@ -189,7 +189,7 @@ function useFaceTexture(profile) {
   return texture;
 }
 
-function Alien({position=[0,0,0],scale=1,seed=0,color=GREEN,hero=false,profile,mode,levelRef,clockStart,reducedMotion=false,judge=false,event}) {
+function Alien({position=[0,0,0],scale=1,seed=0,color=GREEN,hero=false,profile,mode,levelRef,clockStart,reducedMotion=false,judge=false,event,showcase=false,playing=true}) {
   const texture=useFaceTexture(hero?profile:null);
   const style=hero?profile?.style:null;
   const styleKey=styleFingerprint(style);
@@ -208,7 +208,7 @@ function Alien({position=[0,0,0],scale=1,seed=0,color=GREEN,hero=false,profile,m
   useFrame(({clock},delta)=>{
     const t=clock.elapsedTime, q=t*1.9+seed*2.15, parts=model.userData;
     const level=levelRef?.current||0; const dance=mode==='performance'||mode==='results';
-    const performing=hero&&mode==='performance';
+    const performing=hero&&mode==='performance'&&(!showcase||playing);
     const amp=reducedMotion?.08:1;
     destination.set(...base.current);
     const travel=restPosition.current.distanceTo(destination);
@@ -236,7 +236,7 @@ function Alien({position=[0,0,0],scale=1,seed=0,color=GREEN,hero=false,profile,m
         model.position.x+=Math.sin(t*.17+seed)*.65;
         model.position.z+=Math.sin(t*.2+seed*3)*.35;
       }
-      if(hero&&(mode==='club'||mode==='performance')){
+      if(hero&&!showcase&&(mode==='club'||mode==='performance')){
         model.position.x+=Math.sin(t*.22)*.6;
         model.position.z+=Math.sin(t*.3)*.45;
         model.rotation.y+=Math.sin(t*.4)*.25;
@@ -271,9 +271,19 @@ function Alien({position=[0,0,0],scale=1,seed=0,color=GREEN,hero=false,profile,m
         parts.legs[1].rotation.x=-Math.sin(eventTime*10+seed)*.8;
         parts.arms[0].rotation.x=-1;parts.arms[1].rotation.x=-1;
       }
-      if(event?.kind==='visitor'&&hero&&eventTime<7){
+      if(event?.kind==='visitor'&&hero&&!showcase&&eventTime<7){
         model.position.z+=Math.sin(eventTime/7*Math.PI)*1.7;
         parts.arms[1].rotation.z=2+Math.sin(eventTime*8)*.25;
+      }
+      // When the song is paused, the on-screen avatar idles instead of freezing mid-step.
+      if(showcase&&!playing){
+        model.position.y+=Math.sin(t*1.8)*.035;
+        model.rotation.z=Math.sin(t*1.2)*.025;
+        parts.arms[0].rotation.z=-.18+Math.sin(t*1.2)*.06;
+        parts.arms[1].rotation.z=.18+Math.sin(t*1.2)*.06;
+        parts.head.rotation.z=Math.sin(t*1.2)*.055;
+        parts.legs[0].rotation.x=0;
+        parts.legs[1].rotation.x=0;
       }
     }else{
       // Gentle motion is intentionally quiet, not a frozen performance pose.
@@ -284,8 +294,13 @@ function Alien({position=[0,0,0],scale=1,seed=0,color=GREEN,hero=false,profile,m
       parts.legs[0].rotation.x=0;
       parts.legs[1].rotation.x=0;
       if(performing){
-        model.position.y+=Math.sin(t*1.4)*.018;
-        parts.head.rotation.z=Math.sin(t*1.1)*.025;
+        model.position.y+=Math.sin(t*1.4)*(showcase ? .042 : .018);
+        parts.head.rotation.z=Math.sin(t*1.1)*(showcase ? .05 : .025);
+        if(showcase){
+          model.rotation.z=Math.sin(t*.95)*.03;
+          parts.arms[0].rotation.z=-.12+Math.sin(t*.95)*.1;
+          parts.arms[1].rotation.z=.12+Math.sin(t*.95)*.1;
+        }
       }
     }
     if(hero&&mode==='abduction'){
@@ -606,6 +621,38 @@ export default function World({mode='menu',profile=null,levelRef,event=null,onTr
   return <WorldBoundary><Canvas className="world-canvas" resize={{offsetSize:true}} camera={{position:[10.2,6.7,14.7],fov:47,near:.1,far:100}} dpr={[1,1.5]} gl={{antialias:true,alpha:false,powerPreference:'high-performance'}} style={{position:'absolute',inset:0,width:'100%',height:'100%'}} onCreated={({gl})=>{gl.outputColorSpace=THREE.SRGBColorSpace;gl.toneMapping=THREE.ACESFilmicToneMapping;gl.toneMappingExposure=1.12;}}>
     <Scene mode={mode} profile={profile} levelRef={levelRef} event={event} reducedMotion={reducedMotion}/>
   </Canvas></WorldBoundary>;
+}
+
+
+// Dedicated low-cost stage camera: renders the actual customized alien model,
+// rather than animating a screenshot of its face. It never touches the video.
+function SingingAvatarScene({profile,playing,reducedMotion}){
+  const clockStart=useRef(0);
+  return <>
+    <ambientLight intensity={1.5} color="#d7d5ff"/>
+    <hemisphereLight args={['#fff6d9','#47416c',2]}/>
+    <directionalLight position={[3,7,6]} intensity={3.3} color="#fff8d4"/>
+    <directionalLight position={[-4,4,0]} intensity={1.8} color="#dfbaff"/>
+    <pointLight position={[0,2.7,4]} intensity={6} distance={9} color="#c7ff54"/>
+    <mesh position={[0,-.08,0]}>
+      <cylinderGeometry args={[1.18,1.25,.16,20]}/>
+      <meshStandardMaterial color="#2b2740" metalness={.3} roughness={.55}/>
+    </mesh>
+    <Ring position={[0,.012,0]} r={1.15} t={.026} color="#c7ff54"/>
+    <Alien hero showcase profile={profile} position={[0,.08,0]} scale={1} mode="performance" clockStart={clockStart} reducedMotion={reducedMotion} playing={playing}/>
+  </>;
+}
+
+/** Live full-body dancer for the karaoke screen. The face texture, outfit,
+ * skin tone and head accessories all come from the singer's actual avatar. */
+export function DancingAlienAvatar({profile,playing=true,reducedMotion=false}){
+  return <div className="dancing-alien-canvas" role="img" aria-label={`${profile?.nickname||'Your alien'} dancing on the karaoke stage`}>
+    <WorldBoundary>
+      <Canvas resize={{offsetSize:true}} camera={{position:[0,2.05,7.8],fov:38,near:.1,far:30}} dpr={[1,1.25]} gl={{alpha:true,antialias:true,powerPreference:'low-power'}} style={{position:'absolute',inset:0,width:'100%',height:'100%',pointerEvents:'none'}} onCreated={({gl})=>{gl.outputColorSpace=THREE.SRGBColorSpace;gl.toneMapping=THREE.ACESFilmicToneMapping;gl.toneMappingExposure=1.12;gl.setClearColor('#000000',0);}}>
+        <SingingAvatarScene profile={profile} playing={playing} reducedMotion={reducedMotion}/>
+      </Canvas>
+    </WorldBoundary>
+  </div>;
 }
 
 function PreviewScene({profile,transparent=false}) {

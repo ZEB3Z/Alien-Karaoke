@@ -62,3 +62,59 @@
 @media(prefers-reduced-motion:reduce){
   .performer-dancing>.alien-portrait,.performer-gentle>.alien-portrait{animation:none}
 }
+
+/* Karaoke's live avatar is a real, animated full-body 3D model.
+   Keep it beside/below the player so YouTube playback remains unobstructed. */
+.performance-content{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) clamp(200px,20vw,260px);
+  align-items:start;
+  gap:clamp(18px,3vw,44px);
+  margin-top:23px;
+}
+.performance-content .performance-stage{width:100%;min-width:0;margin-top:0}
+.performance-avatar-card{
+  position:relative;min-width:0;
+  border:1px solid #bbf88b50;
+  background:linear-gradient(155deg,#222039e8,#10111fef 75%);
+  box-shadow:6px 6px 0 #0005,inset 0 0 45px #c7ff5409;
+  overflow:hidden;
+}
+.performance-avatar-card::before{
+  content:'';position:absolute;inset:40px 0 55px;
+  background:radial-gradient(ellipse at 50% 74%,#ac85e337,transparent 65%);
+  pointer-events:none;
+}
+.avatar-card-heading{
+  display:flex;align-items:center;gap:8px;
+  padding:14px 15px 5px;
+  color:var(--acid);font:700 9px var(--mono);letter-spacing:.09em;
+}
+.dancing-alien-canvas{height:335px;width:100%;position:relative;overflow:hidden;pointer-events:none}
+.dancing-alien-canvas>div{width:100%;height:100%}
+.avatar-card-footer{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:5px 12px 18px;text-align:center;
+}
+.avatar-card-footer strong{
+  font:800 24px/.96 var(--display);text-transform:uppercase;
+  max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.avatar-card-footer>span{font:7px var(--mono);letter-spacing:.06em;color:#ada5c9}
+.cinema .performance-content{display:block}
+.cinema .performance-avatar-card{display:none}
+.cinema .performance-content .performance-stage{width:min(100%,1200px);margin:0 auto}
+@media(max-width:1050px){
+  .performance-content{display:flex;flex-direction:column;align-items:stretch;gap:18px}
+  .performance-content .performance-stage{width:100%}
+  .performance-avatar-card{width:min(100%,360px);align-self:center}
+  .dancing-alien-canvas{height:245px}
+  .avatar-card-heading{padding:10px 12px 0}
+  .avatar-card-footer{padding:1px 12px 13px}
+}
+@media(max-width:760px){
+  .performance-content{margin-top:18px;gap:14px}
+  .performance-avatar-card{width:min(100%,300px)}
+  .dancing-alien-canvas{height:235px}
+  .avatar-card-footer strong{font-size:21px}
+}
