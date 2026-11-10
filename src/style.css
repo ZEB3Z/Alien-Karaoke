@@ -38,3 +38,9 @@
 .recent-empty{display:flex;align-items:center;flex-direction:column;gap:7px;padding:29px 12px 22px;text-align:center;color:var(--acid)}
 .recent-empty strong{font:900 20px var(--display)}
 .recent-empty span{font:9px/1.5 var(--mono);color:#a9a6b9}
+
+/* Singer portrait dances during the performance */
+.dancing-portrait{display:inline-flex;transform-origin:50% 100%;animation:portrait-dance .9s ease-in-out infinite}
+@keyframes portrait-dance{0%,100%{transform:translateY(0) rotate(-6deg)}25%{transform:translateY(-5px) rotate(0)}50%{transform:translateY(0) rotate(6deg)}75%{transform:translateY(-5px) rotate(0)}}
+.reduced-motion .dancing-portrait{animation:none}
+@media(prefers-reduced-motion:reduce){.dancing-portrait{animation:none}}

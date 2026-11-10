@@ -238,6 +238,22 @@ function Alien({position=[0,0,0],scale=1,seed=0,color=GREEN,hero=false,profile,m
         model.rotation.y+=Math.sin(t*.4)*.25;
         if(Math.sin(t*.13)>.8)model.position.z+=.7;
       }
+      if(hero&&mode==='performance'&&travel<=.15){
+        // Karaoke dance: bouncy two-step with alternating arm pumps, hip sway and head bob.
+        const b=t*6+level*.5;
+        model.position.y+=Math.abs(Math.sin(b))*.17+level*.1;
+        model.position.x+=Math.sin(b*.5)*.18;
+        model.rotation.z=Math.sin(b)*.09;
+        model.rotation.y+=Math.sin(b*.5)*.3;
+        parts.head.rotation.z=Math.sin(b)*.18;
+        parts.head.rotation.x=Math.abs(Math.sin(b))*.14;
+        parts.arms[0].rotation.z=-.85-Math.sin(b)*.45-level*.5;
+        parts.arms[1].rotation.z=.85+Math.sin(b+Math.PI)*.45+level*.5;
+        parts.arms[0].rotation.x=Math.sin(b*.5)*.35;
+        parts.arms[1].rotation.x=-Math.sin(b*.5)*.35;
+        parts.legs[0].rotation.x=Math.sin(b)*.3;
+        parts.legs[1].rotation.x=-Math.sin(b)*.3;
+      }
       const eventTime=performance.now()/1000-eventStart.current;
       if(event?.kind==='parade'&&!hero&&!judge&&eventTime<7){
         model.position.x+=Math.sin(eventTime*1.7+seed)*1.35;
