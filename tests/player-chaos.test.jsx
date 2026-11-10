@@ -9,21 +9,21 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('nonblocking YouTube player pranks', () => {
-  it('automatically starts and cleans up short effects, without overlapping events', () => {
+describe('nonblocking YouTube player glitches', () => {
+  it('automatically starts and cleans up short glitches, without overlapping events', () => {
     vi.useFakeTimers();
     vi.spyOn(Math, 'random').mockReturnValue(0);
     const { result } = renderHook(() => usePlayerChaos(true, 'videoA'));
     expect(result.current.prank).toBeNull();
-    act(() => vi.advanceTimersByTime(9500));
-    expect(result.current.prank.kind).toBe('grab');
+    act(() => vi.advanceTimersByTime(7000));
+    expect(result.current.prank.kind).toBe('rgb');
     act(() => vi.advanceTimersByTime(PRANK_DURATION_MS));
     expect(result.current.prank).toBeNull();
-    act(() => vi.advanceTimersByTime(22000 - PRANK_DURATION_MS));
-    expect(result.current.prank.kind).toBe('shake');
+    act(() => vi.advanceTimersByTime(14000 - PRANK_DURATION_MS));
+    expect(result.current.prank.kind).toBe('tear');
   });
 
-  it('stops animating during pause, focus mode, or gentle motion and resets on new song', () => {
+  it('stops glitching during pause, focus mode, or gentle motion and resets on new song', () => {
     vi.useFakeTimers();
     vi.spyOn(Math, 'random').mockReturnValue(0);
     const { result, rerender } = renderHook(({ enabled, videoId }) => usePlayerChaos(enabled, videoId), {
@@ -39,12 +39,11 @@ describe('nonblocking YouTube player pranks', () => {
     expect(result.current.prank).toBeNull();
   });
 
-  it('renders graphics that are decorative, inaccessible to pointer input, and do not contain video elements', () => {
-    const { container, rerender } = render(<PlayerChaos prank={{ kind: 'abduct', id: 'ufo-1' }} />);
+  it('renders a decorative overlay that is hidden from assistive tech and holds no media elements', () => {
+    const { container, rerender } = render(<PlayerChaos prank={{ kind: 'tear', id: 'glitch-1' }} />);
     const overlay = container.querySelector('.player-chaos-layer');
     expect(overlay.getAttribute('aria-hidden')).toBe('true');
-    expect(overlay.querySelector('.chaos-ufo')).not.toBeNull();
-    expect(overlay.querySelector('.chaos-tractor-beam')).not.toBeNull();
+    expect(overlay.querySelector('.glitch-bar')).not.toBeNull();
     expect(overlay.querySelector('iframe,video,audio,button')).toBeNull();
     rerender(<PlayerChaos prank={null} />);
     expect(container.querySelector('.player-chaos-layer')).toBeNull();
