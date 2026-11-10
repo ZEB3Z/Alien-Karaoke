@@ -28,3 +28,70 @@
 .reg-customizer-tip{font:9px/1.55 'Courier New',monospace;color:#858197;border-top:1px dashed #756c8355;padding-top:9px}
 @media(max-width:450px){.reg-color-option>span:last-child{font-size:7px}.reg-customizer{padding:11px}.reg-accessory-option{padding:5px}.reg-accessory-option>small{font-size:7px}.reg-palette-row{gap:8px}}
 @media(prefers-reduced-motion:reduce){.reg-color-option,.reg-accessory-option,.reg-palette-option{transition:none}}
+
+/* ===== Wide two-column customization screen =====
+   Preview step only: the 3D alien stays pinned on the left while every control
+   scrolls on the right, so you never scroll back and forth to see the model.
+   Larger type throughout. The first (photo) step keeps its compact dialog. */
+.registration-dialog.reg-is-preview{width:min(100%,1180px);max-height:calc(100dvh - 32px);padding:26px 40px 24px}
+.reg-is-preview .reg-topline{font-size:12px}
+.reg-is-preview h2{font-size:34px;margin:12px 0 6px;letter-spacing:-1px}
+.reg-is-preview h2 br{display:none}
+.reg-is-preview h2 em{margin-left:.3em}
+.reg-is-preview .reg-intro{font-size:15px;margin:0 0 18px}
+.reg-split{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:34px;align-items:start}
+.reg-split-view{position:sticky;top:0;min-width:0;align-self:start}
+.reg-split-controls{min-width:0}
+.reg-is-preview .reg-label{font-size:13px;margin:0 0 10px}
+.reg-is-preview .reg-label>span{font-size:12px}
+.reg-split-controls>.reg-label{margin-top:0}
+.reg-is-preview .reg-name-wrap input{height:54px;font-size:17px}
+.reg-is-preview .reg-name-wrap>span{font-size:12px;top:19px}
+.reg-is-preview .reg-preview-tabs button{font-size:13px;min-height:42px}
+.reg-is-preview .reg-alien-preview .avatar-filter-preview{height:min(60vh,580px)!important;min-height:360px}
+.reg-is-preview .reg-preview-badge{font-size:10px;bottom:14px}
+.reg-is-preview .reg-transform-compare figure>div{height:min(52vh,500px)}
+.reg-is-preview .reg-transformed-only figure>div{height:min(60vh,580px)}
+.reg-is-preview .reg-transform-compare figcaption{font-size:12px}
+.reg-is-preview .reg-customizer{margin:18px 0 12px;padding:20px}
+.reg-is-preview .reg-customizer-title{font-size:15px}
+.reg-is-preview .reg-customizer-title>span{font-size:11px;padding:4px 8px}
+.reg-is-preview .reg-customizer-help{font-size:14px;line-height:1.6;margin:12px 0 18px}
+.reg-is-preview .reg-style-field{margin-bottom:20px}
+.reg-is-preview .reg-style-field legend{font-size:13px;margin-bottom:11px}
+.reg-is-preview .reg-color-grid{gap:8px}
+.reg-is-preview .reg-color-option{min-height:84px;padding:9px 4px 8px;gap:8px}
+.reg-is-preview .reg-color-dot{width:40px;height:40px}
+.reg-is-preview .reg-color-option>span:last-child{font-size:12px}
+.reg-is-preview .reg-accessory-grid{gap:8px}
+.reg-is-preview .reg-accessory-option{min-height:52px;padding:8px 10px;gap:9px}
+.reg-is-preview .reg-accessory-option>span{font-size:26px;min-width:28px}
+.reg-is-preview .reg-accessory-option>small{font-size:12px}
+.reg-is-preview .reg-palette-row{gap:12px}
+.reg-is-preview .reg-palette-option{width:46px;height:46px;border-radius:9px}
+.reg-is-preview .reg-customizer-tip{font-size:13px;padding-top:11px}
+.reg-is-preview .reg-filter-summary{padding:8px 0}
+.reg-is-preview .reg-filter-summary p{font-size:14px}
+.reg-is-preview .reg-adjust{font-size:13px;padding:6px 0 10px}
+.reg-is-preview .reg-photo-buttons button{font-size:13px;min-height:46px}
+.reg-is-preview .reg-generate{font-size:15px;height:58px}
+.reg-is-preview .reg-privacy{font-size:12px}
+.reg-is-preview .reg-error{font-size:14px}
+
+@media(max-width:900px){
+  .registration-dialog.reg-is-preview{padding:20px 18px 18px;max-height:calc(100dvh - 20px)}
+  .reg-split{grid-template-columns:1fr;gap:14px}
+  /* Phone/tablet: alien stays pinned at the top while the controls scroll underneath. */
+  .reg-split-view{z-index:3;background:#171526;padding:0 0 8px;box-shadow:0 8px 14px #000a}
+  .reg-split-view>.reg-label{display:none}
+  .reg-is-preview .reg-alien-preview .avatar-filter-preview{height:min(38vh,320px)!important;min-height:210px}
+  .reg-is-preview .reg-transform-compare figure>div,.reg-is-preview .reg-transformed-only figure>div{height:min(34vh,280px)}
+  .reg-is-preview h2{font-size:28px}
+  .reg-is-preview .reg-intro{display:none}
+  .reg-is-preview .reg-color-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .reg-is-preview .reg-accessory-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:450px){
+  .reg-is-preview .reg-color-option>span:last-child{font-size:11px}
+  .reg-is-preview .reg-accessory-option>small{font-size:11px}
+}

@@ -284,31 +284,45 @@ export default function Registration({ profile, onComplete, onCancel, onSound })
       <div className="reg-topline"><span className="reg-status-dot" /> EARTHLING INTAKE <span>SECTOR 09</span></div>
       <h2 id="registration-title">YOUR FACE.<br /><em>ALIEN ENERGY.</em></h2>
       <p className="reg-intro">{isPreview ? 'Still unmistakably you. Just a little less terrestrial.' : 'One small photo for you. One giant head for alienkind.'}</p>
-      <form onSubmit={submit}>
+      <form onSubmit={submit} className={isPreview ? 'reg-split' : undefined}>
+        {isPreview ? <>
+          <div className="reg-split-view">
+        <div className="reg-label"><span>03</span> MEET YOUR NEW SPECIES</div>
+        <div className="reg-preview-tabs" role="group" aria-label="Alien preview view">
+          <button type="button" aria-pressed={previewTab === '3d'} onClick={() => setPreviewTab('3d')}><Sparkles size={13} /> 3D ALIEN</button>
+          <button type="button" aria-pressed={previewTab === 'face'} onClick={() => setPreviewTab('face')}><ScanFace size={13} /> FACE FILTER</button>
+        </div>
+        {previewTab === '3d' ? <div className="reg-alien-preview" aria-label="Your transformed 3D alien preview"><AvatarPreview profile={previewProfile} /><span className="reg-preview-badge"><span /> LANDMARK TRANSFORMATION COMPLETE</span></div> : <div className={`reg-transform-compare ${sourceCrop ? '' : 'reg-transformed-only'}`}>
+          {sourceCrop && <figure><div><img src={sourceCrop} alt="Original face before transformation" /></div><figcaption>HUMAN FREQUENCY</figcaption></figure>}
+          <figure><div className="reg-filtered-photo"><img src={generated.photo} alt="Your transformed alien face" /></div><figcaption>ALIEN FREQUENCY</figcaption></figure>
+        </div>}
+          </div>
+          <div className="reg-split-controls">
+      <label className="reg-label" htmlFor="alien-nickname"><span>01</span> PICK YOUR SPACE NAME</label>
+      <div className="reg-name-wrap"><input id="alien-nickname" placeholder="e.g. Cosmic Dave" autoComplete="nickname" maxLength={20} value={nickname} onChange={(event) => setNickname(event.target.value)} required /><span>{nickname.length}/20</span></div>
+        <section className="reg-customizer" aria-label="Alien customization">
+          <div className="reg-customizer-title"><Sparkles size={16} /> <strong>04 / MUTATE YOUR LOOK</strong><span>LIVE 3D</span></div>
+          <p className="reg-customizer-help">Pick your species color, ridiculous headgear, suit and neon trim. Your choices appear on your alien and in the Hall of Fame.</p>
+          <fieldset className="reg-style-field"><legend>SKIN / SPECIES COLOR</legend><div className="reg-color-grid">{SKINS.map(option => <button key={option.id} type="button" className="reg-color-option" aria-label={`Skin: ${option.label}`} aria-pressed={alienStyle.skin === option.id} onClick={() => changeStyle('skin', option.id)}><span className="reg-color-dot" style={{ '--swatch': option.hex }} /><span>{option.label}</span></button>)}</div></fieldset>
+          <fieldset className="reg-style-field"><legend>HEAD ACCESSORY</legend><div className="reg-accessory-grid">{ACCESSORIES.map(option => <button key={option.id} type="button" aria-pressed={alienStyle.accessory === option.id} className="reg-accessory-option" onClick={() => changeStyle('accessory', option.id)}><span aria-hidden="true">{option.icon}</span><small>{option.label}</small></button>)}</div></fieldset>
+          <fieldset className="reg-style-field"><legend>SPACE SUIT</legend><div className="reg-palette-row">{OUTFITS.map(option => <button key={option.id} type="button" className="reg-palette-option" aria-label={`Suit: ${option.label}`} aria-pressed={alienStyle.outfit === option.id} title={option.label} onClick={() => changeStyle('outfit', option.id)} style={{ '--swatch': option.hex }} />)}</div></fieldset>
+          <fieldset className="reg-style-field"><legend>NEON ACCESSORY COLOR</legend><div className="reg-palette-row">{ACCENTS.map(option => <button key={option.id} type="button" className="reg-palette-option" aria-label={`Neon: ${option.label}`} aria-pressed={alienStyle.accent === option.id} title={option.label} onClick={() => changeStyle('accent', option.id)} style={{ '--swatch': option.hex }} />)}</div></fieldset>
+          <div className="reg-customizer-tip">Your face stays yours. Only the alien styling changes.</div>
+        </section>
+        <div className="reg-filter-summary"><Check size={14} /><p>Face-shaped warp. Bigger eyes. Your new cosmic colors.<br /><span>Your expression and facial details stay yours.</span></p></div>
+        <button type="button" className="reg-adjust" onClick={() => { setPreviewOpen(false); setError(''); }}><ChevronLeft size={15} /> {image ? 'ADJUST PHOTO' : 'CHOOSE ANOTHER PHOTO'}</button>
+      <div className="reg-photo-buttons">
+        {cameraOn ? <button type="button" className="reg-camera-button" onClick={capture} disabled={busy}><Camera size={16} /> CAPTURE PHOTO</button> : <button type="button" className="reg-camera-button" onClick={startCamera} disabled={busy}>{image || generated ? <RotateCcw size={16} /> : <Camera size={16} />}{image || generated ? 'RETAKE PHOTO' : 'USE CAMERA'}</button>}
+        <button type="button" className="reg-upload-button" onClick={() => fileRef.current?.click()} disabled={busy}><Upload size={16} /> UPLOAD PHOTO</button>
+        <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/gif" onChange={upload} hidden />
+      </div>
+      {error && <p role="alert" className="reg-error">{error}</p>}
+      <button type="submit" data-filter-confirm={isPreview ? '' : undefined} className="reg-generate" disabled={busy || (!image && !generated) || !nickname.trim()}><span>{isPreview ? <Check size={18} /> : <ScanFace size={18} />} {isPreview ? 'CONFIRM MY ALIEN' : processing ? 'TRANSFORMING YOUR FACE…' : 'PREVIEW MY ALIEN'}</span><ArrowRight size={20} /></button>
+      <p className="reg-privacy"><ShieldCheck size={13} /> Processed once, entirely on this device. Your photo never leaves it.</p>
+          </div>
+        </> : <>
         <label className="reg-label" htmlFor="alien-nickname"><span>01</span> PICK YOUR SPACE NAME</label>
         <div className="reg-name-wrap"><input id="alien-nickname" placeholder="e.g. Cosmic Dave" autoComplete="nickname" maxLength={20} value={nickname} onChange={(event) => setNickname(event.target.value)} required /><span>{nickname.length}/20</span></div>
-        {isPreview ? <>
-          <div className="reg-label"><span>03</span> MEET YOUR NEW SPECIES</div>
-          <div className="reg-preview-tabs" role="group" aria-label="Alien preview view">
-            <button type="button" aria-pressed={previewTab === '3d'} onClick={() => setPreviewTab('3d')}><Sparkles size={13} /> 3D ALIEN</button>
-            <button type="button" aria-pressed={previewTab === 'face'} onClick={() => setPreviewTab('face')}><ScanFace size={13} /> FACE FILTER</button>
-          </div>
-          {previewTab === '3d' ? <div className="reg-alien-preview" aria-label="Your transformed 3D alien preview"><AvatarPreview profile={previewProfile} /><span className="reg-preview-badge"><span /> LANDMARK TRANSFORMATION COMPLETE</span></div> : <div className={`reg-transform-compare ${sourceCrop ? '' : 'reg-transformed-only'}`}>
-            {sourceCrop && <figure><div><img src={sourceCrop} alt="Original face before transformation" /></div><figcaption>HUMAN FREQUENCY</figcaption></figure>}
-            <figure><div className="reg-filtered-photo"><img src={generated.photo} alt="Your transformed alien face" /></div><figcaption>ALIEN FREQUENCY</figcaption></figure>
-          </div>}
-          <section className="reg-customizer" aria-label="Alien customization">
-            <div className="reg-customizer-title"><Sparkles size={16} /> <strong>04 / MUTATE YOUR LOOK</strong><span>LIVE 3D</span></div>
-            <p className="reg-customizer-help">Pick your species color, ridiculous headgear, suit and neon trim. Your choices appear on your alien and in the Hall of Fame.</p>
-            <fieldset className="reg-style-field"><legend>SKIN / SPECIES COLOR</legend><div className="reg-color-grid">{SKINS.map(option => <button key={option.id} type="button" className="reg-color-option" aria-label={`Skin: ${option.label}`} aria-pressed={alienStyle.skin === option.id} onClick={() => changeStyle('skin', option.id)}><span className="reg-color-dot" style={{ '--swatch': option.hex }} /><span>{option.label}</span></button>)}</div></fieldset>
-            <fieldset className="reg-style-field"><legend>HEAD ACCESSORY</legend><div className="reg-accessory-grid">{ACCESSORIES.map(option => <button key={option.id} type="button" aria-pressed={alienStyle.accessory === option.id} className="reg-accessory-option" onClick={() => changeStyle('accessory', option.id)}><span aria-hidden="true">{option.icon}</span><small>{option.label}</small></button>)}</div></fieldset>
-            <fieldset className="reg-style-field"><legend>SPACE SUIT</legend><div className="reg-palette-row">{OUTFITS.map(option => <button key={option.id} type="button" className="reg-palette-option" aria-label={`Suit: ${option.label}`} aria-pressed={alienStyle.outfit === option.id} title={option.label} onClick={() => changeStyle('outfit', option.id)} style={{ '--swatch': option.hex }} />)}</div></fieldset>
-            <fieldset className="reg-style-field"><legend>NEON ACCESSORY COLOR</legend><div className="reg-palette-row">{ACCENTS.map(option => <button key={option.id} type="button" className="reg-palette-option" aria-label={`Neon: ${option.label}`} aria-pressed={alienStyle.accent === option.id} title={option.label} onClick={() => changeStyle('accent', option.id)} style={{ '--swatch': option.hex }} />)}</div></fieldset>
-            <div className="reg-customizer-tip">Your face stays yours. Only the alien styling changes.</div>
-          </section>
-          <div className="reg-filter-summary"><Check size={14} /><p>Face-shaped warp. Bigger eyes. Your new cosmic colors.<br /><span>Your expression and facial details stay yours.</span></p></div>
-          <button type="button" className="reg-adjust" onClick={() => { setPreviewOpen(false); setError(''); }}><ChevronLeft size={15} /> {image ? 'ADJUST PHOTO' : 'CHOOSE ANOTHER PHOTO'}</button>
-        </> : <>
           <div className="reg-label"><span>02</span> SCAN YOUR HUMAN FACE</div>
           <div className={`reg-camera ${image ? 'has-photo' : ''}`}>
             {cameraOn ? <video ref={videoRef} playsInline autoPlay muted aria-label="Live camera preview" onClick={() => videoRef.current?.play()} /> : image ? <img ref={imageRef} src={image} alt="Your face crop preview" onLoad={(event) => setImageRatio(event.currentTarget.naturalWidth / event.currentTarget.naturalHeight)} style={{ width: `${width}%`, height: `${height}%`, left: `${-(width - 100) * position.x / 100}%`, top: `${-(height - 100) * position.y / 100}%` }} /> : <div className="reg-camera-empty"><ScanFace size={60} strokeWidth={1} /><strong>HUMAN DETECTED?</strong><span>Center one face. Maximum weirdness encouraged.</span></div>}
@@ -323,7 +337,6 @@ export default function Registration({ profile, onComplete, onCancel, onSound })
           </div>}
           {processing && <button type="button" className="reg-cancel-transform" onClick={cancelTransformation}>CANCEL TRANSFORMATION</button>}
           <p className="reg-photo-hint">Use one clear, front-facing face with even light. We detect your features, reshape them into an alien, and blend the result into your 3D head. You’ll see it before you confirm.</p>
-        </>}
         <div className="reg-photo-buttons">
           {cameraOn ? <button type="button" className="reg-camera-button" onClick={capture} disabled={busy}><Camera size={16} /> CAPTURE PHOTO</button> : <button type="button" className="reg-camera-button" onClick={startCamera} disabled={busy}>{image || generated ? <RotateCcw size={16} /> : <Camera size={16} />}{image || generated ? 'RETAKE PHOTO' : 'USE CAMERA'}</button>}
           <button type="button" className="reg-upload-button" onClick={() => fileRef.current?.click()} disabled={busy}><Upload size={16} /> UPLOAD PHOTO</button>
@@ -332,6 +345,7 @@ export default function Registration({ profile, onComplete, onCancel, onSound })
         {error && <p role="alert" className="reg-error">{error}</p>}
         <button type="submit" data-filter-confirm={isPreview ? '' : undefined} className="reg-generate" disabled={busy || (!image && !generated) || !nickname.trim()}><span>{isPreview ? <Check size={18} /> : <ScanFace size={18} />} {isPreview ? 'CONFIRM MY ALIEN' : processing ? 'TRANSFORMING YOUR FACE…' : 'PREVIEW MY ALIEN'}</span><ArrowRight size={20} /></button>
         <p className="reg-privacy"><ShieldCheck size={13} /> Processed once, entirely on this device. Your photo never leaves it.</p>
+        </>}
       </form>
     </section>
   </div>;
